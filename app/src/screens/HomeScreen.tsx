@@ -4,8 +4,9 @@ import GroupFlatList from '../components/ui/GroupFlatList'
 import SearchBar from '../components/ui/SearchBar'
 import Typography from '../components/typography/Typography'
 import Button from '../components/ui/Button'
-import AddDataModal, { AddDataModalRef } from '../components/ui/modals/AddDataModal'
+import AddPartyModal from '../components/ui/modals/AddPartyModal'
 import { useRef } from 'react'
+import { AddDataModalRef } from '../types'
 
 const HomeScreen = () => {
   const modalRef = useRef<AddDataModalRef>(null);
@@ -21,7 +22,7 @@ const HomeScreen = () => {
           <SearchBar />
         </View>
       <GroupFlatList />
-      <AddDataModal ref={modalRef} />
+      <AddPartyModal title={"Add new party"} ref={modalRef} />
     </View>
   )
 }

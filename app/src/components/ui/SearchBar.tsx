@@ -25,7 +25,7 @@ export default SearchBar
 
 const styles = StyleSheet.create({
     input: {
-        borderRadius: 12,
+        borderRadius: 8,
         width: "100%",
         backgroundColor: getColor("light"),
         borderWidth: 1,

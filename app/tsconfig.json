@@ -2,6 +2,11 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "jsx": "react-native",
+    "module": "es2020",       
+    "target": "es2020",   
+    "moduleResolution": "node", 
+    "esModuleInterop": true,   
     "paths": {
       "@/*": [
         "./*"

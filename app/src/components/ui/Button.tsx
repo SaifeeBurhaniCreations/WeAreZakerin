@@ -74,7 +74,7 @@ const Button = ({ children, variant = "fill", onPress, size = "lg", full }: Butt
         style={[styles.baseFill, getButtonStyle(size), { alignSelf: full ? "stretch" : "center" }]}
       >
         <Animated.View style={animatedStyle}>
-          <Typography variant={getButtonFont(size)}>{children}</Typography>
+          <Typography variant={getButtonFont(size)} color={getColor("light")}>{children}</Typography>
         </Animated.View>
       </Pressable>
     );

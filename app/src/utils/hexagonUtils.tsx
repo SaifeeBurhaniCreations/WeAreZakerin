@@ -1,11 +1,10 @@
 import { View } from "react-native";
-import HexagonIcon from "../components/icons/menu/HexagonIcon";
+import HexagonIcon from "../components/icons/HexagonIcon";
 
-export const renderHexagonRow = (index: number, MenuSheetWidth: number) => {
-    const extraPadding = index % 2 === 0 ? 16 : 0; 
+export const renderHexagonRow = (index: number, ScreenWidth: number, color: string) => {
     return (
-      <View key={index} style={{ flexDirection: 'row', paddingLeft: extraPadding }}>
-        <HexagonIcon size={MenuSheetWidth + 32} />
+      <View key={index} style={{ flexDirection: 'row' }}>
+        <HexagonIcon color={color} size={ScreenWidth + 56} />
       </View>
     );
   };

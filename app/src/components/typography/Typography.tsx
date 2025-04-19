@@ -1,5 +1,5 @@
 import { getColor } from "@/src/constants/colors";
-import React, { memo } from "react";
+import { memo } from "react";
 import { Text, TextProps, TextStyle } from "react-native";
 
 // Define typography styles

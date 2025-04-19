@@ -1,73 +1,85 @@
 import "@/global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { useEffect } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import * as Font from "expo-font";
 import { createStackNavigator } from "@react-navigation/stack";
-import LoginScreen from "@/src/screens/LoginScreen";
-import LandingScreen from "@/src/screens/LandingScreen";
-import LoaderScreen from "@/src/components/ui/loader/LoaderScreen";
-import HomeScreen from "@/src/screens/HomeScreen";
-// import Fab from "@/src/components/ui/Fab";
 import { Platform, View, StatusBar as RNStatusBar } from "react-native";
-// import { store } from "@/src/redux/store";
 import { StatusBar } from "expo-status-bar";
 import { getColor } from "@/src/constants/colors";
 import { AntiAuthGuard, AuthGuard } from "@/src/components/layouts/Guard";
 import 'react-native-gesture-handler';
 
+// Lazy load screens
+const LoginScreen = React.lazy(() => import('@/src/screens/LoginScreen'));
+const LandingScreen = React.lazy(() => import('@/src/screens/LandingScreen'));
+const LoaderScreen = React.lazy(() => import('@/src/components/ui/loader/LoaderScreen'));
+const HomeScreen = React.lazy(() => import('@/src/screens/HomeScreen'));
+
 const Stack = createStackNavigator();
 
-
 export default function RootLayout() {
+  const [isAppReady, setIsAppReady] = useState(false);
 
   useEffect(() => {
-    async function loadFonts() {
-      await Font.loadAsync({
-        "FunnelSans-Regular": require("@/src/assets/fonts/FunnelSans-Regular.ttf"),
-        "FunnelSans-SemiBold": require("@/src/assets/fonts/FunnelSans-SemiBold.ttf"),
-        "FunnelSans-Bold": require("@/src/assets/fonts/FunnelSans-Bold.ttf"),
-      });
+    async function loadResources() {
+      try {
+        // Load fonts asynchronously
+        await Font.loadAsync({
+          "FunnelSans-Regular": require("@/src/assets/fonts/FunnelSans-Regular.ttf"),
+          "FunnelSans-SemiBold": require("@/src/assets/fonts/FunnelSans-SemiBold.ttf"),
+          "FunnelSans-Bold": require("@/src/assets/fonts/FunnelSans-Bold.ttf"),
+        });
 
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        setIsAppReady(true);
+      } catch (e) {
+        console.error("App load error", e);
+      }
     }
-    loadFonts();
+
+    loadResources();
   }, []);
 
+  if (!isAppReady) {
+    return (
+      <Suspense fallback={<LoaderScreen />}>
+        <LoaderScreen />
+      </Suspense>
+    );
+  }
+
   return (
-    <GluestackUIProvider mode="light"><View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0, }}>
-      <StatusBar backgroundColor={getColor("green")} style="light" />
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" options={{ headerShown: false }}>
-          {() => (
-            <AuthGuard>
-              <HomeScreen />
-            </AuthGuard>
-          )}
-        </Stack.Screen>
+    <GluestackUIProvider mode="light">
+      <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
+        <StatusBar backgroundColor={getColor("green")} style="light" />
+        <Suspense fallback={<LoaderScreen />}>
+          <Stack.Navigator initialRouteName="Landing">
+            <Stack.Screen name="Home" options={{ headerShown: false }}>
+              {() => (
+                <AuthGuard>
+                  <HomeScreen />
+                </AuthGuard>
+              )}
+            </Stack.Screen>
 
+            <Stack.Screen name="Login" options={{ headerShown: false }}>
+              {() => (
+                <AntiAuthGuard>
+                  <LoginScreen />
+                </AntiAuthGuard>
+              )}
+            </Stack.Screen>
 
-        <Stack.Screen name="Login" options={{ headerShown: false }}>
-          {() => (
-            <AntiAuthGuard>
-              <LoginScreen />
-            </AntiAuthGuard>
-          )}
-        </Stack.Screen>
-
-        <Stack.Screen name="Landing" options={{ headerShown: false }}>
-          {() => (
-            <AntiAuthGuard>
-              <LandingScreen />
-            </AntiAuthGuard>
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="Loader" options={{ headerShown: false }}>
-          {() => (
-            <AntiAuthGuard>
-              <LoaderScreen />
-            </AntiAuthGuard>
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
-    </View></GluestackUIProvider>
+            <Stack.Screen name="Landing" options={{ headerShown: false }}>
+              {() => (
+                <AntiAuthGuard>
+                  <LandingScreen />
+                </AntiAuthGuard>
+              )}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </Suspense>
+      </View>
+    </GluestackUIProvider>
   );
 }
