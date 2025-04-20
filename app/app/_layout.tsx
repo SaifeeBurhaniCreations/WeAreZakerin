@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { getColor } from "@/src/constants/colors";
 import { AntiAuthGuard, AuthGuard } from "@/src/components/layouts/Guard";
 import 'react-native-gesture-handler';
+import UsersScreen from "@/src/screens/UsersScreen";
 
 // Lazy load screens
 const LoginScreen = React.lazy(() => import('@/src/screens/LoginScreen'));
@@ -53,11 +54,18 @@ export default function RootLayout() {
       <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
         <StatusBar backgroundColor={getColor("green")} style="light" />
         <Suspense fallback={<LoaderScreen />}>
-          <Stack.Navigator initialRouteName="Landing">
+          <Stack.Navigator initialRouteName="Home">
             <Stack.Screen name="Home" options={{ headerShown: false }}>
               {() => (
                 <AuthGuard>
                   <HomeScreen />
+                </AuthGuard>
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="Users" options={{ headerShown: false }}>
+              {() => (
+                <AuthGuard>
+                  <UsersScreen />
                 </AuthGuard>
               )}
             </Stack.Screen>

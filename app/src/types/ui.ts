@@ -16,7 +16,20 @@ export interface GroupCardProps {
         member: string[] | number[],
         image: ImageSourcePropType;
         tag: string;
-    }
+    },
+    pressable?: boolean;
+    onPress?: () => void;
+}
+export interface UserCardProps {
+    item: {
+        name: string,
+        its: string,
+        party: string,
+        image: ImageSourcePropType;
+        tag: string;
+    },
+    pressable?: boolean;
+    onPress?: () => void;
 }
 
 export interface TagProps {

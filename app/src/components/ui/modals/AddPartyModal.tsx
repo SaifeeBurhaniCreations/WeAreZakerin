@@ -46,9 +46,8 @@ const AddPartyModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title },
           <ScrollView contentContainerStyle={styles.content}>
             <Typography variant="h3">{title}</Typography>
 
-            <Input placeholder='Name' />
+            <Input placeholder='Party Name' />
 
-            {/* Custom Select Component */}
             <Select
               options={[
                 { label: "Add Admin", value: "add_admin" },
