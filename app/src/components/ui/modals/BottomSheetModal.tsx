@@ -11,15 +11,12 @@ import Modal from 'react-native-modal';
 import { getColor } from '@/src/constants/colors';
 import Typography from '../../typography/Typography';
 import { AddDataModalProps, AddDataModalRef } from '@/src/types';
-import Input from '../Input';
 import Button from '../Button';
-import Select from '../Select';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const AddPartyModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title }, ref) => {
+const BottomSheetModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title, children, footer }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<string>("");
 
   useImperativeHandle(ref, () => ({
     open: () => setIsVisible(true),
@@ -45,43 +42,18 @@ const AddPartyModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title },
           <View style={styles.handle} />
           <ScrollView contentContainerStyle={styles.content}>
             <Typography variant="h3">{title}</Typography>
-
-            <Input placeholder='Party Name' />
-
-            <Select
-              options={[
-                { label: "Add Admin", value: "add_admin" },
-                { label: "Aliasger", value: "h_member" },
-                { label: "Jafarussadiq", value: "h_admin" },
-                { label: "Hussain", value: "m_member", disabled: true },
-              ]}
-              value={selectedValue}
-              onSelect={(val) => setSelectedValue(val)}
-              placeholder="Choose Admin"
-            />
-
-            {selectedValue === "add_admin" && (
-              <View style={{ gap: 16 }}>
-                <Input placeholder="Full Name" />
-                <Input placeholder="ITS number" />
-                <Input placeholder="Phone Number" />
-                <Input placeholder="Address" />
-              </View>
-            )}
-
+            {children}
           </ScrollView>
-            <View style={{ marginTop: 8, marginHorizontal: 16 }}>
-              <Button onPress={() => setIsVisible(false)} full>
-                Save
-              </Button>
-            </View>
+  <View style={{ marginTop: 8, marginHorizontal: 16 }}>
+    <Button onPress={() => setIsVisible(false)} full>{footer}</Button>
+  </View>
         </View>
       </KeyboardAvoidingView>
     </Modal>
   );
 });
 
-export default AddPartyModal;
+export default BottomSheetModal;
 
 const styles = StyleSheet.create({
   modal: {

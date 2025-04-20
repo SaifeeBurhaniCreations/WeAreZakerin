@@ -8,13 +8,14 @@ import { StatusBar } from "expo-status-bar";
 import { getColor } from "@/src/constants/colors";
 import { AntiAuthGuard, AuthGuard } from "@/src/components/layouts/Guard";
 import 'react-native-gesture-handler';
-import UsersScreen from "@/src/screens/UsersScreen";
 
 // Lazy load screens
 const LoginScreen = React.lazy(() => import('@/src/screens/LoginScreen'));
 const LandingScreen = React.lazy(() => import('@/src/screens/LandingScreen'));
 const LoaderScreen = React.lazy(() => import('@/src/components/ui/loader/LoaderScreen'));
 const HomeScreen = React.lazy(() => import('@/src/screens/HomeScreen'));
+const UsersScreen = React.lazy(() => import('@/src/screens/UsersScreen'));
+const ProfileScreen = React.lazy(() => import('@/src/screens/ProfileScreen'));
 
 const Stack = createStackNavigator();
 
@@ -54,7 +55,7 @@ export default function RootLayout() {
       <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
         <StatusBar backgroundColor={getColor("green")} style="light" />
         <Suspense fallback={<LoaderScreen />}>
-          <Stack.Navigator initialRouteName="Home">
+          <Stack.Navigator initialRouteName="Users">
             <Stack.Screen name="Home" options={{ headerShown: false }}>
               {() => (
                 <AuthGuard>
@@ -66,6 +67,13 @@ export default function RootLayout() {
               {() => (
                 <AuthGuard>
                   <UsersScreen />
+                </AuthGuard>
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="Profile" options={{ headerShown: false }}>
+              {() => (
+                <AuthGuard>
+                  <ProfileScreen />
                 </AuthGuard>
               )}
             </Stack.Screen>

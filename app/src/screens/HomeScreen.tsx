@@ -4,18 +4,21 @@ import GroupFlatList from '../components/ui/Group/GroupFlatList'
 import SearchBar from '../components/ui/SearchBar'
 import Typography from '../components/typography/Typography'
 import Button from '../components/ui/Button'
-import AddPartyModal from '../components/ui/modals/AddPartyModal'
-import { useRef } from 'react'
+import BottomSheetModal from '../components/ui/modals/BottomSheetModal'
+import { useRef, useState } from 'react'
 import { AddDataModalRef } from '../types'
 import { RootStackParamList } from '../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from "@react-navigation/native";
+import Input from '../components/ui/Input';
+import Select from '../components/ui/Select';
 
-export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Users'>;
+export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Users'>;
 
 const HomeScreen = () => {
   const modalRef = useRef<AddDataModalRef>(null);
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const [selectedValue, setSelectedValue] = useState<string>("");
   
   return (
     <View style={styles.pageContainer}>
@@ -28,7 +31,31 @@ const HomeScreen = () => {
           <SearchBar />
         </View>
       <GroupFlatList pressable onPress={() => navigation.navigate("Users")} />
-      <AddPartyModal title={"Add new party"} ref={modalRef} />
+      <BottomSheetModal title={"Add new party"} ref={modalRef} footer={"Add"}>
+                
+              <Input placeholder='Party Name' />
+
+        <Select
+          options={[
+            { label: "Add Admin", value: "add_admin" },
+            { label: "Aliasger", value: "h_member" },
+            { label: "Jafarussadiq", value: "h_admin" },
+            { label: "Hussain", value: "m_member", disabled: true },
+          ]}
+          value={selectedValue}
+          onSelect={(val) => setSelectedValue(val)}
+          placeholder="Choose Admin"
+        />
+
+        {selectedValue === "add_admin" && (
+          <View style={{ gap: 16 }}>
+            <Input placeholder="Full Name" />
+            <Input placeholder="ITS number" />
+            <Input placeholder="Phone Number" />
+            <Input placeholder="Address" />
+          </View>
+        )}
+      </BottomSheetModal>
     </View>
   )
 }

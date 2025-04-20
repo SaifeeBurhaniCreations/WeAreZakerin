@@ -24,7 +24,7 @@ export interface UserCardProps {
     item: {
         name: string,
         its: string,
-        party: string,
+        title: string,
         image: ImageSourcePropType;
         tag: string;
     },
@@ -45,6 +45,8 @@ export type AddDataModalRef = {
 
 export type AddDataModalProps = {
     title: string;
+    children?: ReactNode;
+    footer?: string;
 };
 
 
@@ -75,3 +77,11 @@ export interface IconProps {
     size?: number;
     style?: any;
 }
+
+export interface SwitchProps {
+    text?: string | [string, string]
+    style?: any
+    value?: boolean
+    onValueChange?: (value: boolean) => void
+  }
+  
