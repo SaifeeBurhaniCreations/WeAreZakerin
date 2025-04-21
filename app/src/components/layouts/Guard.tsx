@@ -1,15 +1,19 @@
 import { useEffect } from "react";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation,  useRoute, RouteProp } from "@react-navigation/native";
 import { View } from "react-native";
-import { RootStackParamList } from "@/src/types";
+import { RootStackParamList, screenTitleMap } from "@/src/types";
 import * as SecureStore from 'expo-secure-store';
 import { StyleSheet } from "react-native";
 import commonBanner from '@/src/assets/images/ashara-hd.png'
 import { Image } from "react-native";
+import PageHeader from "../ui/PageHeader";
+
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
 
+    const route = useRoute<RouteProp<RootStackParamList>>()
+    const title = screenTitleMap[route.name] ?? route.name;
 
   // useEffect(() => {
   //   const checkAuth = async () => {
@@ -26,6 +30,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   return (
     <View style={styles.container}>
+      <PageHeader title={title} goBack={navigation.goBack} canGoBack={navigation.canGoBack()} />
      <Image
         source={commonBanner}
         alt='ashara banner'

@@ -16,6 +16,7 @@ const LoaderScreen = React.lazy(() => import('@/src/components/ui/loader/LoaderS
 const HomeScreen = React.lazy(() => import('@/src/screens/HomeScreen'));
 const UsersScreen = React.lazy(() => import('@/src/screens/UsersScreen'));
 const ProfileScreen = React.lazy(() => import('@/src/screens/ProfileScreen'));
+const EditProfileScreen = React.lazy(() => import('@/src/screens/EditProfileScreen'));
 
 const Stack = createStackNavigator();
 
@@ -32,7 +33,7 @@ export default function RootLayout() {
           "FunnelSans-Bold": require("@/src/assets/fonts/FunnelSans-Bold.ttf"),
         });
 
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         setIsAppReady(true);
       } catch (e) {
         console.error("App load error", e);
@@ -55,7 +56,7 @@ export default function RootLayout() {
       <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
         <StatusBar backgroundColor={getColor("green")} style="light" />
         <Suspense fallback={<LoaderScreen />}>
-          <Stack.Navigator initialRouteName="Users">
+          <Stack.Navigator initialRouteName="EditProfile">
             <Stack.Screen name="Home" options={{ headerShown: false }}>
               {() => (
                 <AuthGuard>
@@ -77,6 +78,13 @@ export default function RootLayout() {
                 </AuthGuard>
               )}
             </Stack.Screen>
+            <Stack.Screen name="EditProfile" options={{ headerShown: false }}>
+              {() => (
+                <AuthGuard>
+                  <EditProfileScreen />
+                </AuthGuard>
+              )}
+            </Stack.Screen>
 
             <Stack.Screen name="Login" options={{ headerShown: false }}>
               {() => (
@@ -90,6 +98,13 @@ export default function RootLayout() {
               {() => (
                 <AntiAuthGuard>
                   <LandingScreen />
+                </AntiAuthGuard>
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="Loader" options={{ headerShown: false }}>
+              {() => (
+                <AntiAuthGuard>
+                  <LoaderScreen />
                 </AntiAuthGuard>
               )}
             </Stack.Screen>

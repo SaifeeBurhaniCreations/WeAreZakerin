@@ -7,6 +7,7 @@ export type RootStackParamList = {
     Loader: undefined;
     Users: undefined;
     Profile: undefined;
+    EditProfile: undefined;
 };
 
 export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;

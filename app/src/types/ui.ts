@@ -52,11 +52,14 @@ export type AddDataModalProps = {
 
 export type InputProps = {
     icon?: ElementType;
+    title?: string
     iconSize?: number;
     disabled?: boolean;
     placeholder?: string;
     post?: boolean;
     style?: any;
+    value?: string
+    onChangeText?: (text: string) => void
 };
 
 export type Option = {
@@ -83,5 +86,19 @@ export interface SwitchProps {
     style?: any
     value?: boolean
     onValueChange?: (value: boolean) => void
+  }
+  
+
+  export const screenTitleMap: Record<string, string> = {
+    EditProfile: 'Edit Profile',
+    Home: 'Home',
+    Users: 'User',
+    Profile: 'Profile',
+  }
+
+  export interface PageHeaderProps {
+    title: string
+    goBack?: () => void
+    canGoBack?: boolean
   }
   

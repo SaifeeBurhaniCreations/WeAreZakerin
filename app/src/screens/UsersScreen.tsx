@@ -53,10 +53,10 @@ const UsersScreen = () => {
                 <Input placeholder="Address" />
                 <Select
                     options={[
-                        { label: "Admin", value: "admin" },
-                        { label: "Aliasger", value: "h_member" },
-                        { label: "Jafarussadiq", value: "h_admin" },
-                        { label: "Hussain", value: "m_member", disabled: true },
+                        { label: "Tipper", value: "tipper" },
+                        { label: "Support", value: "support" },
+                        { label: "Peaker", value: "peaker" },
+                        { label: "Closer", value: "closer", disabled: true },
                     ]}
                     value={selectedValue}
                     onSelect={(val) => setSelectedValue(val)}
