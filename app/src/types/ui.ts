@@ -94,6 +94,7 @@ export interface SwitchProps {
     Home: 'Home',
     Users: 'User',
     Profile: 'Profile',
+    ScheduleEvent: 'Schedule Event',
   }
 
   export interface PageHeaderProps {

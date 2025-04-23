@@ -17,6 +17,7 @@ const HomeScreen = React.lazy(() => import('@/src/screens/HomeScreen'));
 const UsersScreen = React.lazy(() => import('@/src/screens/UsersScreen'));
 const ProfileScreen = React.lazy(() => import('@/src/screens/ProfileScreen'));
 const EditProfileScreen = React.lazy(() => import('@/src/screens/EditProfileScreen'));
+const ScheduleEventScreen = React.lazy(() => import('@/src/screens/ScheduleEventScreen'));
 
 const Stack = createStackNavigator();
 
@@ -56,7 +57,7 @@ export default function RootLayout() {
       <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
         <StatusBar backgroundColor={getColor("green")} style="light" />
         <Suspense fallback={<LoaderScreen />}>
-          <Stack.Navigator initialRouteName="EditProfile">
+          <Stack.Navigator initialRouteName="ScheduleEvent">
             <Stack.Screen name="Home" options={{ headerShown: false }}>
               {() => (
                 <AuthGuard>
@@ -82,6 +83,13 @@ export default function RootLayout() {
               {() => (
                 <AuthGuard>
                   <EditProfileScreen />
+                </AuthGuard>
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="ScheduleEvent" options={{ headerShown: false }}>
+              {() => (
+                <AuthGuard>
+                  <ScheduleEventScreen />
                 </AuthGuard>
               )}
             </Stack.Screen>

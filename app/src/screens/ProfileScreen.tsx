@@ -9,6 +9,8 @@ import Tag from '../components/ui/Tag'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from '../types'
+import MailIcon from '../components/icons/MailIcon'
+import PhoneIcon from '../components/icons/PhoneIcon'
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
 
@@ -20,11 +22,19 @@ const ProfileScreen = () => {
       <Image source={avatar} style={styles.avatar} />
       <View style={[styles.Hstack]}>
       <Typography variant="h3" color={getColor("green", 700)}>Aliasger Baroor</Typography>
-      <Tag size='sm'>Admin</Tag>
+      <Tag size='sm'>Tipper</Tag>
       </View>
       <View style={[styles.Hstack]}>
         <MisqaatIcon color={getColor("green", 500)} size={20} />
         <Typography variant="b2" color={getColor("green", 500)}>30346323</Typography>
+      </View>
+      <View style={[styles.Hstack]}>
+        <PhoneIcon color={getColor("green", 500)} size={20} />
+        <Typography variant="b2" color={getColor("green", 500)}>1234567890</Typography>
+      </View>
+      <View style={[styles.Hstack]}>
+        <MailIcon color={getColor("green", 500)} size={20} />
+        <Typography variant="b2" color={getColor("green", 500)}>a@sbcreations.com</Typography>
       </View>
       <View style={[styles.Hstack]}>
         <LocationIcon color={getColor("green", 500)} size={20} />
