@@ -13,7 +13,7 @@ const SearchBar = () => {
                             <InputSlot>
                 <InputIcon style={{ marginLeft: 12, color: getColor("green", 700) }} as={SearchIcon}></InputIcon>
             </InputSlot>
-            <InputField placeholder="Search by party name, ITS number" placeholderTextColor={getColor("green", 700)} type="text"
+            <InputField placeholder="Search by party name, ITS" placeholderTextColor={getColor("green", 700)} type="text"
             />
 
         </Input>
