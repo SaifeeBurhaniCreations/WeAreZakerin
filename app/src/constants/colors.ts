@@ -1,11 +1,19 @@
 export const colors = {
   red: {
-    500: "#F55747",
-    700: "#CB1D0B",
+    100: "#FCE6E2", // light blush
+    200: "#FAB4AA", // warm coral tint
+    300: "#F88778", // soft but noticeable
+    400: "#F66855", // warm and alive
+    500: "#F55747", // (you already have this)
+    700: "#CB1D0B", // (you already have this)
   },
   blue: {
-    500: "#45B3F7",
-    700: "#0982CE",
+    100: "#E1F4FD", // icy blue
+    200: "#B3E1FA", // soft sky blue
+    300: "#83CDF7", // calm and smooth
+    400: "#5AC1F8", // a bit punchier
+    500: "#45B3F7", // (you already have this)
+    700: "#0982CE", // (you already have this)
   },
   green: {
     100: "#DDEAD5", 

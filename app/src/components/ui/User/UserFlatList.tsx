@@ -12,8 +12,8 @@ const UserFlatList = ({ pressable, onPress } : {pressable?: boolean, onPress?: (
   const [loading, setLoading] = useState(false);
 
   const data = useMemo(() => [
-    { id: '1', image: require('@/src/assets/images/users/user-1.png'), name: "Aliasger Barood", title: "Tipper", its: "30532154", tag: "me" },
-    { id: '2', image: require('@/src/assets/images/users/user-1.png'), name: "Jafarussadiq chandbhai", title: "Support", its: "30862154", tag: "" },
+    { id: '1', image: require('@/src/assets/images/users/user-1.png'), name: "Aliasger Barood", title: "Support", its: "30532154", tag: "me" },
+    { id: '2', image: require('@/src/assets/images/users/user-1.png'), name: "Jafarussadiq chandbhai", title: "Tipper", its: "30862154", tag: "" },
     { id: '3', image: require('@/src/assets/images/users/user-1.png'), name: "Mohammad banduk", title: "Support", its: "30905321", tag: "" },
   ], []);
 

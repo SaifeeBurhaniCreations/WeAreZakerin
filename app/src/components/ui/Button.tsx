@@ -24,7 +24,7 @@ const getButtonStyle = (size: string) => {
   }
 };
 
-const Button = ({ children, variant = "fill", onPress, size = "lg", full }: ButtonProps) => {
+const Button = ({ children, variant = "fill", onPress, size = "lg", full, disabled }: ButtonProps) => {
   const scale = new Animated.Value(1);
   const opacity = new Animated.Value(1); 
 
@@ -68,13 +68,13 @@ const Button = ({ children, variant = "fill", onPress, size = "lg", full }: Butt
   if (variant === "fill") {
     return (
       <Pressable
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[styles.baseFill, getButtonStyle(size), { alignSelf: full ? "stretch" : "center" }]}
+      onPress={(event) => !disabled && onPress?.(event)}
+        onPressIn={ () => !disabled && handlePressIn()}
+        onPressOut={ () => !disabled && handlePressOut()}
+        style={[disabled ? styles.disabled : styles.baseFill, getButtonStyle(size), { alignSelf: full ? "stretch" : "center" }]}
       >
         <Animated.View style={animatedStyle}>
-          <Typography variant={getButtonFont(size)} color={getColor("light")}>{children}</Typography>
+          <Typography variant={getButtonFont(size)} color={disabled ? getColor("green", 200) : getColor("light")}>{children}</Typography>
         </Animated.View>
       </Pressable>
     );
@@ -106,6 +106,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: getColor("green"),
     backgroundColor: getColor("light"),
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  disabled: {
+    backgroundColor: getColor("green", 100),
     borderRadius: 8,
     alignItems: 'center',
   },

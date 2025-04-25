@@ -13,9 +13,9 @@ const typographyStyles = {
   b1: { fontSize: 22, fontWeight: "500", lineHeight: 30 },
   b2: { fontSize: 18, fontWeight: "400", lineHeight: 24 },
   b3: { fontSize: 16, fontWeight: "500", lineHeight: 22 },
-  b4: { fontSize: 14, fontWeight: "500", lineHeight: 20 },
-  b5: { fontSize: 10, fontWeight: "500", lineHeight: 14 },
-  b6: { fontSize: 6, fontWeight: "500", lineHeight: 10 },
+  b4: { fontSize: 14, fontWeight: "400", lineHeight: 20 },
+  b5: { fontSize: 10, fontWeight: "400", lineHeight: 14 },
+  b6: { fontSize: 6, fontWeight: "300", lineHeight: 10 },
   BigInt64Array: { fontSize: 14, fontWeight: "400", lineHeight: 20 },
   caption: { fontSize: 12, fontWeight: "400", lineHeight: 16, color: getColor("green") },
 } as const;

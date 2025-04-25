@@ -8,6 +8,8 @@ import { StatusBar } from "expo-status-bar";
 import { getColor } from "@/src/constants/colors";
 import { AntiAuthGuard, AuthGuard } from "@/src/components/layouts/Guard";
 import 'react-native-gesture-handler';
+import { Provider } from "react-redux";
+import { store } from "@/src/redux/store";
 
 // Lazy load screens
 const LoginScreen = React.lazy(() => import('@/src/screens/LoginScreen'));
@@ -53,6 +55,7 @@ export default function RootLayout() {
   }
 
   return (
+    <Provider store={store}>
     <GluestackUIProvider mode="light">
       <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
         <StatusBar backgroundColor={getColor("green")} style="light" />
@@ -120,5 +123,7 @@ export default function RootLayout() {
         </Suspense>
       </View>
     </GluestackUIProvider>
+    </Provider>
+
   );
 }

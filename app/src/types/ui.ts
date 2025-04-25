@@ -1,4 +1,4 @@
-import { ElementType, ReactNode } from "react";
+import { ComponentType, ElementType, ReactNode } from "react";
 import { GestureResponderEvent, ImageSourcePropType } from "react-native";
 
 export interface ButtonProps {
@@ -7,6 +7,7 @@ export interface ButtonProps {
     size?: "sm" | "md" | "lg" | "xl";
     full?: boolean;
     variant?: "fill" | "outline";
+    disabled?: boolean;
 }
 
 export interface GroupCardProps {
@@ -47,6 +48,8 @@ export type AddDataModalProps = {
     title: string;
     children?: ReactNode;
     footer?: string;
+    onPress?: () => void;
+    disabled?: boolean;
 };
 
 
@@ -103,3 +106,11 @@ export interface SwitchProps {
     canGoBack?: boolean
   }
   
+  export interface FabProps {
+    position: "left" | "right";
+    color: "red" | "green" | "blue" | "yellow"
+}
+export interface FebItemsProps {
+    text: string;
+    icon: ComponentType<IconProps>;
+}

@@ -15,7 +15,7 @@ import Button from '../Button';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const BottomSheetModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title, children, footer }, ref) => {
+const BottomSheetModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title, children, footer, onPress, disabled }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -44,9 +44,17 @@ const BottomSheetModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title
             <Typography variant="h3">{title}</Typography>
             {children}
           </ScrollView>
-  <View style={{ marginTop: 8, marginHorizontal: 16 }}>
-    <Button onPress={() => setIsVisible(false)} full>{footer}</Button>
+ {footer && footer !== "" && (
+   <View style={{ marginTop: 16, marginHorizontal: 16 }}>
+    <Button   onPress={() => {
+    if (onPress) {
+      onPress();  
+    }
+    setIsVisible(false); 
+  }} 
+  full disabled={!!disabled}>{footer}</Button>
   </View>
+  ) }
         </View>
       </KeyboardAvoidingView>
     </Modal>

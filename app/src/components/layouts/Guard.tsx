@@ -1,12 +1,15 @@
 import { useEffect } from "react";
 import { NavigationProp, useNavigation,  useRoute, RouteProp } from "@react-navigation/native";
-import { View } from "react-native";
+import {  View } from "react-native";
 import { RootStackParamList, screenTitleMap } from "@/src/types";
 import * as SecureStore from 'expo-secure-store';
 import { StyleSheet } from "react-native";
 import commonBanner from '@/src/assets/images/ashara-hd.png'
 import { Image } from "react-native";
 import PageHeader from "../ui/PageHeader";
+
+import Fab from "../ui/Fab";
+import { getColor } from "@/src/constants/colors";
 
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -30,17 +33,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   return (
     <View style={styles.container}>
-      <PageHeader title={title} goBack={navigation.goBack} canGoBack={navigation.canGoBack()} />
-     <Image
-        source={commonBanner}
-        alt='ashara banner'
-        style={styles.banner}
-        resizeMode="cover" 
-      />
-  <View style={styles.content}>
-        {children}
+          <PageHeader title={title} goBack={navigation.goBack} canGoBack={navigation.canGoBack()} />
+        <Image
+            source={commonBanner}
+            alt='ashara banner'
+            style={styles.banner}
+            resizeMode="cover" 
+          />
+      <View style={styles.content}>
+            {children}
+      <Fab position="right" color="green" />
+          </View>
       </View>
-  </View>
   );
 }
 export function AntiAuthGuard({ children }: { children: React.ReactNode }) {
