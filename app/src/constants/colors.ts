@@ -24,19 +24,27 @@ export const colors = {
     700: "#4A6848",
   },
   yellow: {
-    100: "#F6EADA",
-    500: "#FF9D00",
-    700: "#CC7E00",
-  },
+    100: "#FDF3DC", // soft sunbeam
+    200: "#FFE3AA", // mellow highlight
+    300: "#FFD066", // active highlight
+    500: "#FF9D00", // your existing bold amber
+    700: "#CC7E00", // deep amber/muted warning
+  }
+  ,
   light: {
-    200: "#FCF9F7",
-    500: "#FFFFFF",
+    100: "#FEFCFA", // almost white with warmth
+    200: "#FCF9F7", // your soft white
+    300: "#F4F0EB", // ivory-ish neutral
+    500: "#FFFFFF", // clean white
   },
-  dark:{
-    300: "#52615A", // lighter charcoal — good for borders or disabled text
-    500: "#2E3830", // main charcoal — excellent for primary text and icons
-    700: "#1E281E", // deep charcoal — perfect for headers, footers, or strong accents
+  
+  dark: {
+    100: "#6C7A72", // dusty charcoal
+    300: "#52615A", // your soft dark
+    500: "#2E3830", // strong base dark
+    700: "#1E281E", // deep shadows
   },
+  
   gradients: {
     primary: ["#3182ce", "#2c5282"],
     secondary: ["#D1D5DB", "#4B5563"],

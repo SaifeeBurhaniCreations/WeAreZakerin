@@ -1,8 +1,12 @@
 import { Image } from "@/components/ui/image"
-import logo from "@/src/assets/images/logo.jpg"
 const Logo = () => {
     return (
-        <Image source={logo} alt='logo' size='xl' />
+        <Image   
+        className="rounded-full"
+        style={{ aspectRatio: 1 }}
+        source={require("@/src/assets/images/logo.jpg")}
+        alt='logo'
+        size='xl' />
     )
 }
 

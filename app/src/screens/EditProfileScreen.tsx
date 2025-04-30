@@ -14,6 +14,7 @@ import CameraIcon from '../components/icons/CameraIcon';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import Overlay from "../components/ui/Overlay";
 
 const EditProfileScreen = () => {
     const [avatarUri, setAvatarUri] = useState<string | null>(null);
@@ -74,6 +75,7 @@ const EditProfileScreen = () => {
                 <View style={[styles.Hstack, styles.justifyCenter, styles.paddingTop20]}>
                     <Button>Save changes</Button>
                 </View>
+      <Overlay />
             </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>
     );

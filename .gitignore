@@ -37,3 +37,7 @@
 
 # typescript
 **/*.tsbuildinfo
+
+
+# temporary
+/demo.txt

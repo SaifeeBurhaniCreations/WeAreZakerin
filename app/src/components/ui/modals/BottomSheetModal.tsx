@@ -15,21 +15,31 @@ import Button from '../Button';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const BottomSheetModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title, children, footer, onPress, disabled }, ref) => {
+const BottomSheetModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title, children, footer, onPress, onClose, disabled }, ref) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
     open: () => setIsVisible(true),
-    close: () => setIsVisible(false),
+    close: () => {
+      setIsVisible(false),
+      onClose && onClose()
+    },
+
   }));
 
   return (
     <Modal
       isVisible={isVisible}
-      onSwipeComplete={() => setIsVisible(false)}
+      onSwipeComplete={() => {
+        setIsVisible(false)
+        onClose && onClose()
+      }}
       swipeDirection="down"
       style={styles.modal}
-      onBackdropPress={() => setIsVisible(false)}
+      onBackdropPress={() => {
+        setIsVisible(false)
+        onClose && onClose()
+      }}
       propagateSwipe
       backdropOpacity={0.4}
       useNativeDriver={false}
@@ -50,6 +60,7 @@ const BottomSheetModal = forwardRef<AddDataModalRef, AddDataModalProps>(({ title
     if (onPress) {
       onPress();  
     }
+    onClose && onClose()
     setIsVisible(false); 
   }} 
   full disabled={!!disabled}>{footer}</Button>

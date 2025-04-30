@@ -18,8 +18,8 @@ import Input from "../components/ui/Input";
 import Select from "../components/ui/Select";
 import Switch from "../components/ui/Switch";
 import { normalizeEvents } from "../utils/eventUtils";
-import { RootState } from "../redux/store";
-import { useSelector } from "react-redux";
+import Overlay from "../components/ui/Overlay";
+import EyeOffIcon from "../components/icons/EyeOffIcon";
 
 const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 const months = [
@@ -106,7 +106,6 @@ const getGregorianDateFromIslamic = (year: number, monthIndex: number, day: numb
 };
 
 const Calendar = () => {
-const { isOpen } = useSelector((state: RootState) => state.fab)
   const modalRef = useRef<AddDataModalRef>(null);
   const createEventModalRef = useRef<AddDataModalRef>(null);
   const today = new Date();
@@ -279,7 +278,7 @@ const { isOpen } = useSelector((state: RootState) => state.fab)
 
         >
           <Typography
-            variant="b3"
+            variant="b2"
             style={[
               {
                 color:
@@ -305,10 +304,13 @@ const { isOpen } = useSelector((state: RootState) => state.fab)
   return (
     <ScrollView contentContainerStyle={styles.pageContainer}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setCurrentIslamicYear((y) => y - 1)}><Text>« Year</Text></TouchableOpacity>
-        <TouchableOpacity onPress={() => setCurrentIslamicYear((y) => y + 1)}><Text>» Year</Text></TouchableOpacity>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)}><Text>Go to Date</Text></TouchableOpacity>
-        <TouchableOpacity onPress={goToToday}><Text>Today</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.headerItem} onPress={() => setCurrentIslamicYear((y) => y - 1)}><Typography variant="b4" color={getColor("dark", 300)}>« Year</Typography></TouchableOpacity>
+
+        <TouchableOpacity style={styles.headerItem} onPress={() => setCurrentIslamicYear((y) => y + 1)}><Typography variant="b4" color={getColor("dark", 300)}>» Year</Typography></TouchableOpacity>
+
+        <TouchableOpacity style={styles.headerItem2} onPress={() => setShowDatePicker(true)}><Typography variant="b4" color={getColor("dark", 300)}>Go to Date</Typography></TouchableOpacity>
+
+        <TouchableOpacity style={styles.headerItem2} onPress={goToToday}><Typography variant="b4" color={getColor("dark", 300)}>Today</Typography></TouchableOpacity>
       </View>
       <View style={styles.islamicMonthName}>
         <Pressable onPress={() => changeIslamicMonth(-1)}>
@@ -320,7 +322,6 @@ const { isOpen } = useSelector((state: RootState) => state.fab)
         </Pressable>
 
       </View>
-      {/* <Typography variant="h4" style={styles.textAlignCenter}>{months[startDate.getMonth()]} {startDate.getFullYear()} - {months[endDate.getMonth()]} {endDate.getFullYear()}</Typography> */}
 
       <View style={styles.daysOfWeek}>
         {daysOfWeek.map((d, idx) => (
@@ -329,6 +330,7 @@ const { isOpen } = useSelector((state: RootState) => state.fab)
       </View>
 
       <View style={styles.grid}>{renderDays()}</View>
+
       <BottomSheetModal title={`Events for ${selectedDateString}`} ref={modalRef} footer="Assign Party">
         {selectedEvents.map((event, index) => (
           <View key={index} style={styles.eventCard}>
@@ -345,12 +347,19 @@ const { isOpen } = useSelector((state: RootState) => state.fab)
         ))}
       </BottomSheetModal>
 
-      <BottomSheetModal title={`Events for ${selectedDateString}`} ref={createEventModalRef} footer="Create Event" onPress={createEvent}>
+      <BottomSheetModal title={`Events for ${selectedDateString}`} ref={createEventModalRef} footer="Create Event" onPress={createEvent} disabled={
+        eventName === "" || 
+        eventDescription === "" || 
+        eventLocation === "" || 
+        selectedParty === ""
+}>
+  <ScrollView>
+  <View style={{ gap: 16 }}>
         <Input
           placeholder='Event Name'
           value={eventName}
-          onChangeText={setEventName}
-        />
+          onChangeText={setEventName}>
+            Event Name</Input>
 
         <Select
           options={[
@@ -366,27 +375,34 @@ const { isOpen } = useSelector((state: RootState) => state.fab)
         <Input
           placeholder='Event Description'
           value={eventDescription}
-          onChangeText={setEventDescription}
-        />
-
+          onChangeText={setEventDescription}>
+            Event Description</Input>
+      <View style={styles.HStack}>
+        <Input
+          placeholder='Event start'
+          mask="time"
+          icon={<EyeOffIcon />}
+          />
+        <Input
+          placeholder='Event End'
+          mask="time"
+          />
+          </View>
         <Input
           placeholder='Event Location'
           value={eventLocation}
-          onChangeText={setEventLocation}
-        />
+          onChangeText={setEventLocation}>
+            Event Location</Input>
 
         <Switch
           text={"day"}
           value={eventSwitchValue}
           onValueChange={setEventSwitchValue}
         />
+        </View>
+        </ScrollView>
       </BottomSheetModal>
-      {isOpen && (
-                <TouchableOpacity
-                    style={styles.overlay} 
-                    activeOpacity={1} 
-                />
-            )}
+      <Overlay />
     </ScrollView>
   );
 };
@@ -454,11 +470,20 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 4,
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject, 
-    backgroundColor: getColor('green', 500, 0.1), 
-    zIndex: 2, 
-},
+  HStack: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  headerItem: {
+    backgroundColor: getColor("yellow", 100),
+    padding: 6,
+    borderRadius: 8
+  },
+  headerItem2: {
+    backgroundColor: getColor("blue", 100),
+    padding: 6,
+    borderRadius: 8
+  },
 });
 
 export default Calendar;

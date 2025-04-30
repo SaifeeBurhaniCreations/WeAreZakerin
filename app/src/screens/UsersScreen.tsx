@@ -12,6 +12,7 @@ import Switch from '../components/ui/Switch'
 import { RootStackParamList } from '../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from "@react-navigation/native";
+import Overlay from "../components/ui/Overlay"
 
 export type UserScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
 
@@ -64,6 +65,8 @@ const UsersScreen = () => {
                 />
                 <Switch text={"admin"} />
             </BottomSheetModal>
+        <Overlay />
+
         </View>
     )
 }

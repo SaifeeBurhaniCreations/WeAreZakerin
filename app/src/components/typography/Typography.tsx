@@ -31,7 +31,7 @@ interface TypographyProps extends TextProps {
 const Typography = memo(({ variant, color, align, style, ...props }: TypographyProps) => {
   const textStyle: TextStyle = {
     ...typographyStyles[variant],
-    color: color || getColor("dark"),
+    color: color || getColor("green", 700),
     textAlign: align || "left",
   };
 

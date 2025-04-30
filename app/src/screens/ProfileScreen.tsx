@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from '../types'
 import MailIcon from '../components/icons/MailIcon'
 import PhoneIcon from '../components/icons/PhoneIcon'
+import Overlay from "../components/ui/Overlay"
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
 
@@ -44,6 +45,8 @@ const ProfileScreen = () => {
         <Button onPress={() => navigation.navigate("EditProfile")}>Edit profile</Button>
         <Button>View Party</Button>
       </View>
+      <Overlay />
+
     </View>
   )
 }

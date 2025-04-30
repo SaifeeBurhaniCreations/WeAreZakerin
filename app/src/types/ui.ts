@@ -1,4 +1,5 @@
-import { ComponentType, ElementType, ReactNode } from "react";
+import { ComponentType, ReactNode } from "react";
+import { TextInputProps } from "react-native";
 import { GestureResponderEvent, ImageSourcePropType } from "react-native";
 
 export interface ButtonProps {
@@ -49,21 +50,29 @@ export type AddDataModalProps = {
     children?: ReactNode;
     footer?: string;
     onPress?: () => void;
+    onClose?: () => void;
     disabled?: boolean;
 };
 
 
-export type InputProps = {
-    icon?: ElementType;
-    title?: string
-    iconSize?: number;
-    disabled?: boolean;
+export interface InputProps {
+    onChangeText?: any;
+    onBlur?: any;
+    children?: ReactNode;
     placeholder?: string;
+    value?: string;
+    color?: "red" | "blue" | "green" | "yellow";
+    icon?: ReactNode;            
     post?: boolean;
-    style?: any;
-    value?: string
-    onChangeText?: (text: string) => void
-};
+    addonText?: string;
+    error?: any;
+    secureTextEntry?: boolean;
+    keyboardType?: TextInputProps['keyboardType'];
+    maxLength?: number;
+    mask?: "time";
+    onIconPress?: () => void;  
+    style?: any;  
+}
 
 export type Option = {
     label: string;
@@ -111,6 +120,7 @@ export interface SwitchProps {
     color: "red" | "green" | "blue" | "yellow"
 }
 export interface FebItemsProps {
+    id: number;
     text: string;
     icon: ComponentType<IconProps>;
 }

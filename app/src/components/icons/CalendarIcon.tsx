@@ -7,7 +7,6 @@ const BackIcon: React.FC<IconProps> = ({ color = "#fff", size = 30, style, ...pr
   return (
     <Svg
       stroke={color}
-      style={style}
       fill={color}
       strokeWidth={0}
       viewBox="0 0 24 24"

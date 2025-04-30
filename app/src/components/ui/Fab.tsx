@@ -4,14 +4,23 @@ import { getColor } from "@/src/constants/colors";
 import { StyleSheet, View, TouchableOpacity, Animated, Dimensions, Pressable } from "react-native";
 import {  useEffect, memo } from "react";
 import { FAB_ITEMS } from "@/src/constants/FabItems";
-import Typography from "../typography/Typography";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleFab } from "@/src/redux/slices/FabSlice";
 import { RootState } from "@/src/redux/store";
 import { useMemoizedStyle } from "@/src/hooks/useMemoizedStyle";
+import Typography from "../typography/Typography";
+import { toggleModal } from "@/src/redux/slices/AddPartySlice";
+import { RootStackParamList } from '../../types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from "@react-navigation/native";
+import { toggleAdminModal } from "@/src/redux/slices/AddAdminSlice";
+
+export type FabNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ScheduleEvent'>;
 
 const { width: screenWidth } = Dimensions.get("window")
 const Fab = ({ position, color }: FabProps) => {
+  const navigation = useNavigation<FabNavigationProp>();
+
     const dispatch = useDispatch()
     const { isOpen } = useSelector((state: RootState) => state.fab)
 
@@ -80,9 +89,10 @@ const Fab = ({ position, color }: FabProps) => {
                         return (
                             <Animated.View key={index} style={{ transform: [{ scale }] }}>
                                 <Pressable
+                                    onPress={() => item.id === 0 ? dispatch(toggleModal(true)) : item.id === 1 ? dispatch(toggleAdminModal(true)) : navigation.navigate("ScheduleEvent") }
                                     onPressIn={handlePressIn}
                                     onPressOut={handlePressOut}
-                                    style={styles.fabItem}
+                                    style ={styles.fabItem}
                                 >
                                     <item.icon color={getColor(color, 500)} size={24} />
                                     <Typography variant="b4" color={getColor(color, 700)}>{item.text}</Typography>
@@ -119,16 +129,17 @@ export default memo(Fab);
 const styles = StyleSheet.create({
     container: {
         position: "absolute",
-        bottom: 42,
+        bottom: 50,
         right: 0,
         alignItems: "center",
+        zIndex: 3
     },
 
     fabContainer: {
         width: screenWidth * 0.5,
         position: "absolute",
         bottom: 40,
-        right: 0,
+        right: 12,
         alignItems: "center",
     },
     fabItem: {
@@ -145,13 +156,13 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 6,
-        elevation: 3,
+        elevation: 3,// Android shadow
     },
 
     /* ✅ FAB Styles */
     fab: {
         borderRadius: 50,
-        padding: 10,
+        padding: 12,
     },
     left: {
         left: 12,
