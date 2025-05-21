@@ -2,12 +2,14 @@ import { getColor } from '@/src/constants/colors'
 import { InputProps } from '@/src/types'
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 import Typography from '../typography/Typography';
+import ClockIcon from '../icons/ClockIcon';
 
 const Input = ({
     children,
     placeholder,
     onChangeText,
     onBlur,
+    onFocus,
     value,
     color = "green",
     icon,
@@ -23,23 +25,29 @@ const Input = ({
     ...props
 }: InputProps) => {
     
-    const renderIcon = (icon: React.ReactNode, onPress?: () => void) => (
-        <Pressable onPress={onPress} style={styles.icon}>
-            {icon}
-        </Pressable>
-    );
-
+    const renderIcon = (icon: React.ReactNode, onPress?: () => void) => {
+        const isString = typeof icon === 'string';
+      
+        return (
+          <Pressable onPress={onPress} style={styles.icon}>
+            {isString ? <Typography variant='b3'>{icon}</Typography> : icon}
+            {mask === "time" && <ClockIcon />}
+          </Pressable>
+        );
+      };
+      
     const renderAddonText = (text: string) => (
         <Typography variant='b2' color={getColor("green", 200)} style={styles.addonText}>{text}</Typography>
     );
 
     const inputInside = (
-        <View style={{ flex: 1 }}>
+        <View style={{ width: "100%" }}>
         <TextInput
             style={styles.textInput}
             placeholder={placeholder}
             onChangeText={onChangeText}
             onBlur={onBlur}
+            onFocus={onFocus}
             placeholderTextColor={getColor("green", 700, 0.7)}
             textAlignVertical="center"
             value={value}
@@ -53,17 +61,33 @@ const Input = ({
 
     const inputWithIcon = (
         <View style={[
-            styles.inputWrapper, 
-            { borderColor: error ? getColor("red", 300) : getColor(color, 100) },
-            style
+          styles.inputWrapper,
+          { borderColor: error ? getColor("red", 300) : getColor(color, 100) },
+          style
         ]}>
-            {!post && icon && renderIcon(icon, onIconPress)}
-            {!post && addonText && renderAddonText(addonText)}
-            {inputInside}
-            {post && addonText && renderAddonText(addonText)}
-            {post && icon && renderIcon(icon, onIconPress)}
+          {!post && (icon || mask === "time") && renderIcon(icon, onIconPress)}
+          {!post && addonText && renderAddonText(addonText)}
+      
+          <TextInput
+            style={styles.textInput}
+            placeholder={placeholder}
+            onChangeText={onChangeText}
+            onBlur={onBlur}
+            onFocus={onFocus}
+            placeholderTextColor={getColor("green", 700, 0.7)}
+            textAlignVertical="center"
+            value={value}
+            secureTextEntry={secureTextEntry}
+            keyboardType={keyboardType}
+            maxLength={maxLength}
+            {...props}
+          />
+      
+          {post && addonText && renderAddonText(addonText)}
+          {post && icon && renderIcon(icon, onIconPress)}
         </View>
-    );
+      );
+      
 
     return children ? (
         <View style={styles.inputContainer}>
@@ -90,15 +114,16 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         backgroundColor: getColor("light"),
         paddingHorizontal: 12,
-        flex: 1,    
-        minWidth: 0, 
+        height: 48,  
+        width: "100%",
     },
     textInput: {
         fontFamily: "FunnelSans-Regular",
         fontSize: 16,
         color: getColor("green", 400),
-        height: 48, 
         paddingVertical: 0,
+        flex: 1, 
+        height: '100%',  
     },
     icon: {
         height: 24, 

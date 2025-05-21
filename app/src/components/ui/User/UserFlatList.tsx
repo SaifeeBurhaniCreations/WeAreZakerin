@@ -3,19 +3,15 @@ import UserCard from './UserCard';
 import { useMemo, useState } from 'react';
 import Spinner from '../loader/Spinner';
 import { View } from 'moti';
+import { UserFlatListProps } from '@/src/types';
 
 const screenWidth = Dimensions.get('window').width;
 const spacing = 16; 
 const cardWidth = (screenWidth - spacing * 3) / 2; 
 
-const UserFlatList = ({ pressable, onPress } : {pressable?: boolean, onPress?: () => void,}) => {
+const UserFlatList = ({users, pressable, onPress } : UserFlatListProps) => {
   const [loading, setLoading] = useState(false);
 
-  const data = useMemo(() => [
-    { id: '1', image: require('@/src/assets/images/users/user-1.png'), name: "Aliasger Barood", title: "Support", its: "30532154", tag: "me" },
-    { id: '2', image: require('@/src/assets/images/users/user-1.png'), name: "Jafarussadiq chandbhai", title: "Tipper", its: "30862154", tag: "" },
-    { id: '3', image: require('@/src/assets/images/users/user-1.png'), name: "Mohammad banduk", title: "Support", its: "30905321", tag: "" },
-  ], []);
 
   const handleLoadMore = () => {
     if (!loading) {
@@ -26,12 +22,12 @@ const UserFlatList = ({ pressable, onPress } : {pressable?: boolean, onPress?: (
 
   return (
     <FlatList
-      data={data}
+      data={users}
       keyExtractor={(item) => item.id}
       numColumns={2}
       renderItem={({ item, index }) => (
         <View style={[styles.cardWrapper, { width: cardWidth, marginRight: index % 2 === 0 ? spacing : 0, }]}>
-          <UserCard item={item} pressable={pressable} onPress={onPress} />
+          <UserCard {...item} pressable={pressable} onPress={onPress} />
         </View>
       )}
       columnWrapperStyle={styles.row}

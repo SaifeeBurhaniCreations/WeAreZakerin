@@ -9,6 +9,16 @@ export type RootStackParamList = {
     Profile: undefined;
     EditProfile: undefined;
     ScheduleEvent: undefined;
+    Piano: undefined;
 };
 
 export type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+
+export const screenTitleMap: Record<string, string> = {
+    EditProfile: 'Edit Profile',
+    Home: 'Home',
+    Users: 'User',
+    Profile: 'Profile',
+    ScheduleEvent: 'Schedule Event',
+  }

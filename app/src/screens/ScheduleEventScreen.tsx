@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
@@ -19,94 +18,14 @@ import Select from "../components/ui/Select";
 import Switch from "../components/ui/Switch";
 import { normalizeEvents } from "../utils/eventUtils";
 import Overlay from "../components/ui/Overlay";
-import EyeOffIcon from "../components/icons/EyeOffIcon";
+import { daysOfWeek, getGregorianDateFromIslamic, getIslamicDate, getIslamicMonthLengths, islamicMonths, months, toArabicNumerals } from "../utils/calanderUtils";
+import dayjs from "dayjs";
+import TimePicker from "../components/ui/TimePicker";
 
-const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
-const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
-
-const islamicMonths = [
-  "Moharrum-ul-Haram", "Safar-ul-Muzaffar", "Rabi-ul-Awwal", "Rabi-ul-Aakhar",
-  "Jamadal-Ula", "Jamadal-Ukhra", "Rajab-ul-Asab", "Shaban-ul-Karim",
-  "Ramadan-al-Moazzam", "Shawwal-al-Mukarram", "Zilqadatil-Haram", "Zilhajjatil-Haram"
-];
-
-const islamicReferenceDate = new Date("2024-07-07");
-const islamicReferenceYear = 1446;
-const msPerDay = 86400000;
-
-const toArabicNumerals = (num: number) => {
-  const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-  return num.toString().split('').map(d => arabicDigits[parseInt(d)] || d).join('');
-};
-
-const getIslamicMonthLengths = (year: number) => {
-  const leapYears = [2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29];
-  const yearInCycle = (year - 1) % 30 + 1;
-  const isLeap = leapYears.includes(yearInCycle);
-  return [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, isLeap ? 30 : 29];
-};
-
-const getIslamicDate = (gregDate: Date) => {
-  const daysSinceReference = Math.floor((gregDate.getTime() - islamicReferenceDate.getTime()) / msPerDay);
-  if (isNaN(daysSinceReference)) return null;
-
-  let year = islamicReferenceYear;
-  let dayCounter = daysSinceReference;
-
-  while (true) {
-    const yearLength = getIslamicMonthLengths(year).reduce((a, b) => a + b, 0);
-    if (dayCounter < 0) {
-      year--;
-      dayCounter += getIslamicMonthLengths(year).reduce((a, b) => a + b, 0);
-    } else if (dayCounter >= yearLength) {
-      dayCounter -= yearLength;
-      year++;
-    } else {
-      break;
-    }
-  }
-
-  const monthLengths = getIslamicMonthLengths(year);
-  let monthIndex = 0;
-  while (dayCounter >= monthLengths[monthIndex]) {
-    dayCounter -= monthLengths[monthIndex];
-    monthIndex++;
-  }
-
-  return {
-    day: dayCounter + 1,
-    month: islamicMonths[monthIndex],
-    monthIndex,
-    year,
-  };
-};
-
-const getGregorianDateFromIslamic = (year: number, monthIndex: number, day: number) => {
-  let totalDays = 0;
-  let y = islamicReferenceYear;
-  while (y < year) {
-    totalDays += getIslamicMonthLengths(y).reduce((a, b) => a + b, 0);
-    y++;
-  }
-  while (y > year) {
-    y--;
-    totalDays -= getIslamicMonthLengths(y).reduce((a, b) => a + b, 0);
-  }
-
-  const monthLengths = getIslamicMonthLengths(year);
-  for (let i = 0; i < monthIndex; i++) {
-    totalDays += monthLengths[i];
-  }
-
-  totalDays += day - 1;
-  return new Date(islamicReferenceDate.getTime() + totalDays * msPerDay);
-};
 
 const Calendar = () => {
   const modalRef = useRef<AddDataModalRef>(null);
+  const AssignPartyRef = useRef<AddDataModalRef>(null);
   const createEventModalRef = useRef<AddDataModalRef>(null);
   const today = new Date();
   const todayIslamic = getIslamicDate(today)!;
@@ -143,6 +62,12 @@ const Calendar = () => {
   const [eventLocation, setEventLocation] = useState("");
   const [eventSwitchValue, setEventSwitchValue] = useState(false);
   const [selectedParty, setSelectedParty] = useState<string>("");
+
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [selectedStartTime, setSelectedStartTime] = useState<Date | null>(null);
+  const [selectedEndTime, setSelectedEndTime] = useState<Date | null>(null);
+
 
   const monthLengths = getIslamicMonthLengths(currentIslamicYear);
   const totalDays = monthLengths[currentIslamicMonthIndex];
@@ -301,6 +226,19 @@ const Calendar = () => {
     return days;
   };
 
+  const handleStartTimeChange = (_: any, time?: Date) => {
+    setShowStartPicker(false);
+    if (time) {
+      setSelectedStartTime(time);
+    }
+  };
+  const handleEndTimeChange = (_: any, time?: Date) => {
+    setShowEndPicker(false);
+    if (time) {
+      setSelectedEndTime(time);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.pageContainer}>
       <View style={styles.header}>
@@ -331,7 +269,7 @@ const Calendar = () => {
 
       <View style={styles.grid}>{renderDays()}</View>
 
-      <BottomSheetModal title={`Events for ${selectedDateString}`} ref={modalRef} footer="Assign Party">
+      <BottomSheetModal title={`Events for ${selectedDateString}`} ref={modalRef} onPress={() => AssignPartyRef.current?.open()} footer="Assign Party">
         {selectedEvents.map((event, index) => (
           <View key={index} style={styles.eventCard}>
             <CircleIcon />
@@ -381,11 +319,19 @@ const Calendar = () => {
         <Input
           placeholder='Event start'
           mask="time"
-          icon={<EyeOffIcon />}
+          value={selectedStartTime ? dayjs(selectedStartTime).format("hh:mm A") : ""}
+          onFocus={() => setShowStartPicker(true)}
+          onPress={() => setShowStartPicker(true)}
+          showSoftInputOnFocus={false}
           />
+          
         <Input
           placeholder='Event End'
           mask="time"
+          value={selectedEndTime ? dayjs(selectedEndTime).format("hh:mm A") : ""}
+          onFocus={() => setShowEndPicker(true)}
+          onPress={() => setShowEndPicker(true)}
+          showSoftInputOnFocus={false}
           />
           </View>
         <Input
@@ -402,7 +348,26 @@ const Calendar = () => {
         </View>
         </ScrollView>
       </BottomSheetModal>
+
+      <BottomSheetModal title={`Assign Party for ${selectedDateString}`} ref={AssignPartyRef} footer="Assign" disabled={selectedParty === ''}>
+      <Select
+          options={[
+            { label: "Hakimi - Jafarussadiq", value: "hakimi" },
+            { label: "Husaini - Hussain", value: "husaini" },
+            { label: "Taheri - Mohammed", value: "taheri" },
+          ]}
+          value={selectedParty}
+          onSelect={(party) => setSelectedParty(party)}
+          placeholder="Assign Party"
+        />
+      </BottomSheetModal>
       <Overlay />
+      {showStartPicker && (
+       <TimePicker selectedTime={selectedStartTime} handleTimeChange={handleStartTimeChange} />
+      )}
+      {showEndPicker && (
+       <TimePicker selectedTime={selectedEndTime} handleTimeChange={handleEndTimeChange} />
+      )}
     </ScrollView>
   );
 };

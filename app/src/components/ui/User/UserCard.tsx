@@ -5,10 +5,10 @@
   import Tag from '../Tag';
   import React, { memo } from 'react';
 
-  const UserCard = ({ item, pressable, onPress }: UserCardProps) => {
+  const UserCard = ({ id, image, name, title, its, tag, pressable, onPress }: UserCardProps) => {
     const CardContent = () => (
       <View style={[styles.Vstack, styles.gap4]}>
-        <Image source={item.image} style={styles.image} />
+        <Image source={image} style={styles.image} />
         <View style={styles.Hstack}>
   <Typography
     variant='h4'
@@ -17,13 +17,13 @@
     ellipsizeMode="tail"
     style={styles.title}
   >
-    {item.name}
+    {name}
   </Typography>
-  {item.tag !== '' && <Tag size='sm'>Me</Tag>}
+  {tag !== '' && <Tag size='sm'>Me</Tag>}
 </View>
 
           <Typography variant='b4' color={getColor('green', 400)}>
-            {item.its} • {item.title}
+            {its} • {title}
           </Typography>
       </View>
     );

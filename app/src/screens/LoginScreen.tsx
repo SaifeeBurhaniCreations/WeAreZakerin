@@ -20,6 +20,10 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
+const loginDB = [
+{userid: "10203040", name: "Aliasger Baroor",  }
+]
+
 const LoginScreen = () => {
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const [showPassword, setShowPassword] = useState(false);

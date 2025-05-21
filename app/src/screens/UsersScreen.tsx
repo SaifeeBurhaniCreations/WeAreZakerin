@@ -3,8 +3,8 @@ import { getColor } from '../constants/colors'
 import UserFlatList from '../components/ui/User/UserFlatList'
 import Typography from '../components/typography/Typography'
 import Button from '../components/ui/Button'
-import { useRef, useState } from 'react'
-import { AddDataModalRef } from '../types'
+import { useMemo, useRef, useState } from 'react'
+import { AddDataModalRef, UserCardProps } from '../types'
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import BottomSheetModal from '../components/ui/modals/BottomSheetModal'
@@ -18,6 +18,12 @@ export type UserScreenNavigationProp = NativeStackNavigationProp<RootStackParamL
 
 
 const UsersScreen = () => {
+    const users = useMemo(() => [
+        { id: '1', image: require('@/src/assets/images/users/user-1.png'), name: "Aliasger Barood", title: "Support", its: "30532154", tag: "me" },
+        { id: '2', image: require('@/src/assets/images/users/user-1.png'), name: "Jafarussadiq chandbhai", title: "Tipper", its: "30862154", tag: "" },
+        { id: '3', image: require('@/src/assets/images/users/user-1.png'), name: "Mohammad banduk", title: "Support", its: "30905321", tag: "" },
+      ], []) as UserCardProps[];
+    
     const modalRef = useRef<AddDataModalRef>(null);
     const [selectedValue, setSelectedValue] = useState<string>("");
     const navigation = useNavigation<UserScreenNavigationProp>();
@@ -45,7 +51,7 @@ const UsersScreen = () => {
 
 
 
-            <UserFlatList pressable onPress={() => navigation.navigate("Profile")} />
+            <UserFlatList users={users} pressable onPress={() => navigation.navigate("Profile")} />
             <BottomSheetModal title={"Add new member"} ref={modalRef} footer={"Add"}>
 
                 <Input placeholder='Full name' />

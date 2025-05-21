@@ -55,9 +55,10 @@ export type AddDataModalProps = {
 };
 
 
-export interface InputProps {
+export interface InputProps extends TextInputProps {
     onChangeText?: any;
     onBlur?: any;
+    onFocus?: any;
     children?: ReactNode;
     placeholder?: string;
     value?: string;
@@ -100,15 +101,6 @@ export interface SwitchProps {
     onValueChange?: (value: boolean) => void
   }
   
-
-  export const screenTitleMap: Record<string, string> = {
-    EditProfile: 'Edit Profile',
-    Home: 'Home',
-    Users: 'User',
-    Profile: 'Profile',
-    ScheduleEvent: 'Schedule Event',
-  }
-
   export interface PageHeaderProps {
     title: string
     goBack?: () => void
@@ -123,4 +115,33 @@ export interface FebItemsProps {
     id: number;
     text: string;
     icon: ComponentType<IconProps>;
+}
+
+    export interface GroupCardProps {
+    id: string;
+    image: ImageSourcePropType;
+    name: string;
+    member: string[] | number[];
+    admin: string;
+    tag: string;
+    }
+
+export interface GroupFlatListProps {
+    groups : GroupCardProps[],
+    pressable?: boolean, 
+    onPress?: () => void
+}
+    export interface UserCardProps {
+    id: string;
+    image: ImageSourcePropType;
+    name: string;
+    title: string;
+    its: string;
+    tag: string;
+    }
+
+export interface UserFlatListProps {
+        users: UserCardProps[],
+         pressable?: boolean,
+          onPress?: () => void,
 }

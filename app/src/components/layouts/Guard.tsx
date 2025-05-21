@@ -42,7 +42,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           />
       <View style={styles.content}>
             {children}
-      <Fab position="right" color="green" />
+      {route.name !== "Piano" && (<Fab position="right" color="green" />) }
+      
           </View>
       </View>
   );

@@ -10,16 +10,15 @@ import { AntiAuthGuard, AuthGuard } from "@/src/components/layouts/Guard";
 import 'react-native-gesture-handler';
 import { Provider } from "react-redux";
 import { store } from "@/src/redux/store";
-
-// Lazy load screens
-const LoginScreen = React.lazy(() => import('@/src/screens/LoginScreen'));
-const LandingScreen = React.lazy(() => import('@/src/screens/LandingScreen'));
-const LoaderScreen = React.lazy(() => import('@/src/components/ui/loader/LoaderScreen'));
-const HomeScreen = React.lazy(() => import('@/src/screens/HomeScreen'));
-const UsersScreen = React.lazy(() => import('@/src/screens/UsersScreen'));
-const ProfileScreen = React.lazy(() => import('@/src/screens/ProfileScreen'));
-const EditProfileScreen = React.lazy(() => import('@/src/screens/EditProfileScreen'));
-const ScheduleEventScreen = React.lazy(() => import('@/src/screens/ScheduleEventScreen'));
+import LoginScreen from '@/src/screens/LoginScreen';
+import LandingScreen from '@/src/screens/LandingScreen';
+import LoaderScreen from '@/src/components/ui/loader/LoaderScreen';
+import HomeScreen from '@/src/screens/HomeScreen';
+import UsersScreen from '@/src/screens/UsersScreen';
+import ProfileScreen from '@/src/screens/ProfileScreen';
+import EditProfileScreen from '@/src/screens/EditProfileScreen';
+import ScheduleEventScreen from '@/src/screens/ScheduleEventScreen';
+import PianoScreen from "@/src/screens/PianoScreen";
 
 const Stack = createStackNavigator();
 
@@ -60,7 +59,7 @@ export default function RootLayout() {
       <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
         <StatusBar backgroundColor={getColor("green")} style="light" />
         <Suspense fallback={<LoaderScreen />}>
-          <Stack.Navigator initialRouteName="ScheduleEvent">
+          <Stack.Navigator initialRouteName="Piano">
             <Stack.Screen name="Home" options={{ headerShown: false }}>
               {() => (
                 <AuthGuard>
@@ -93,6 +92,13 @@ export default function RootLayout() {
               {() => (
                 <AuthGuard>
                   <ScheduleEventScreen />
+                </AuthGuard>
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="Piano" options={{ headerShown: false }}>
+              {() => (
+                <AuthGuard>
+                  <PianoScreen />
                 </AuthGuard>
               )}
             </Stack.Screen>

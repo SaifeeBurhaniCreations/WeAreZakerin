@@ -5,17 +5,17 @@ import Typography from '../../typography/Typography';
 import Tag from '../Tag';
 import React, { memo } from 'react';
 
-const GroupCard = ({ item, pressable, onPress }: GroupCardProps) => {
+const GroupCard = ({ id, image, name, tag, admin, member, pressable, onPress }: GroupCardProps) => {
   const CardContent = () => (
     <View style={styles.cardTitleContainer}>
-      <Image source={item.image} style={styles.image} />
+      <Image source={image} style={styles.image} />
       <View style={styles.Vstack}>
         <View style={styles.Hstack}>
-          <Typography variant='h4' color={getColor('green', 700)}>{item.name}</Typography>
-          {item.tag !== '' && <Tag size='sm'>Me</Tag>}
+          <Typography variant='h4' color={getColor('green', 700)}>{name}</Typography>
+          {tag !== '' && <Tag size='sm'>Me</Tag>}
         </View>
         <Typography variant='b4' color={getColor('green', 400)}>
-          {item.admin} • {item.member.length} member{item.member.length !== 1 && 's'}
+          {admin} • {member.length} member{member.length !== 1 && 's'}
         </Typography>
       </View>
     </View>
