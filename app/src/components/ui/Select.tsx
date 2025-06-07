@@ -11,9 +11,12 @@ import { useState } from "react";
 import { getColor } from "@/src/constants/colors";
 import { ChevronDownIcon } from "@/components/ui/icon";
 import { SelectProps } from "@/src/types";
+import { useWindowDimensions } from "react-native";
 
 const Select = ({ options, placeholder = "Select", onSelect, value }: SelectProps) => {
     const [visible, setVisible] = useState(false);
+    const { width, height } = useWindowDimensions();
+    const isLandscape = width > height;
 
     const selectedLabel =
         options.find((option) => option.value === value)?.label || placeholder;
@@ -36,7 +39,16 @@ const Select = ({ options, placeholder = "Select", onSelect, value }: SelectProp
                     activeOpacity={1}
                     onPress={() => setVisible(false)}
                 >
-                    <View style={styles.sheet}>
+                    <View
+                        style={[
+                            styles.sheet,
+                            isLandscape && {
+                                width: "70%",
+                                alignSelf: "center",
+                                borderRadius: 20,
+                            },
+                        ]}>
+
                         <FlatList
                             data={options}
                             keyExtractor={(item) => item.value}

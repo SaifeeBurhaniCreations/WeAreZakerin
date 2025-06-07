@@ -65,11 +65,11 @@ const EditProfileScreen = () => {
                 </View>
 
                 <View style={styles.formContainer}>
-                    <Input title="Name" value="Aliasger Baroor" onChangeText={() => { }} placeholder="Your name" />
-                    <Input title="ITS" value="30346323" onChangeText={() => { }} placeholder="Your ITS" />
-                    <Input title="Phone number" value="1234567890" onChangeText={() => { }} placeholder="Your phone number" />
-                    <Input title="Email" value="a@sbcreations.com" onChangeText={() => { }} placeholder="Your Email" />
-                    <Input title="Location" value="Jamali mohalla, nurani nagar" onChangeText={() => { }} placeholder="Your Location" />
+                    <Input value="Aliasger Baroor" onChangeText={() => { }} placeholder="Your name">Name</Input>
+                    <Input value="30346323" onChangeText={() => { }} placeholder="Your ITS">ITS</Input>
+                    <Input value="1234567890" onChangeText={() => { }} placeholder="Your phone number" >Phone number</Input>
+                    <Input value="a@sbcreations.com" onChangeText={() => { }} placeholder="Your Email" >Email</Input>
+                    <Input value="Jamali mohalla, nurani nagar" onChangeText={() => { }} placeholder="Your Location" >Location</Input>
                 </View>
 
                 <View style={[styles.Hstack, styles.justifyCenter, styles.paddingTop20]}>

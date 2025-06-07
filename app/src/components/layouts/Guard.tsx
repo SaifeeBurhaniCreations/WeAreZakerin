@@ -9,7 +9,6 @@ import { Image } from "react-native";
 import PageHeader from "../ui/PageHeader";
 
 import Fab from "../ui/Fab";
-import { getColor } from "@/src/constants/colors";
 
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -34,12 +33,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   return (
     <View style={styles.container}>
           <PageHeader title={title} goBack={navigation.goBack} canGoBack={navigation.canGoBack()} />
-        <Image
+          {route.name !== "Piano" && (<Image
             source={commonBanner}
             alt='ashara banner'
             style={styles.banner}
             resizeMode="cover" 
-          />
+          />) }
       <View style={styles.content}>
             {children}
       {route.name !== "Piano" && (<Fab position="right" color="green" />) }
