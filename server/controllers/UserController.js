@@ -71,8 +71,11 @@ router.post("/authentication/login", async (req, res) => {
         return res.status(400).json({ error: "Username and password are required." });
     }
 
+    const ITS = Number(userid)
+
     try {
-        const response_login_find = await userClient.findOne({ userid });
+        const response_login_find = await userClient.find({ });
+        console.log(response_login_find)
         if (!response_login_find) {
             return res.status(401).json({ error: "Username or password is not valid." });
         }
@@ -83,10 +86,11 @@ router.post("/authentication/login", async (req, res) => {
             return res.status(400).json({ error: "Invalid password format" });
         }
 
-        const passwordMatch = await validatePassword(userpass, user.userpass);
-        if (!passwordMatch) {
-            return res.status(401).json({ error: "Username or password is not valid." });
-        }
+        // const passwordMatch = await validatePassword(userpass, user.userpass);
+        // const passwordMatch = true
+        // if (!passwordMatch) {
+        //     return res.status(401).json({ error: "Username or password is not valid." });
+        // }
 
         if (!process.env.JWT_SECRET) {
             console.error("JWT_SECRET is not defined in environment variables.");

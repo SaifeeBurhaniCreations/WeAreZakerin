@@ -8,6 +8,7 @@ fullname: { type: String, default: '' },
 createdat: { type: Date, default: Date.now() },
 updatedat: { type: Date, default: Date.now() },
 userid: { type: Number, default: 0 },
+userpass: { type: String, default: '' },
 address: { type: String, default: '' },
 phone: { type: Number, default: 0 },
 email: { type: String, default: '' },
@@ -20,7 +21,6 @@ profileImage: {
     s3Url: { type: String, default: '' },
     s3Key: { type: String, default: '' },
 },
-userpass: { type: String, default: '' },
 
 }, { collection : "users" });
 

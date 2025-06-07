@@ -15,6 +15,7 @@ import Input from '../components/ui/Input'
 import loginSchema, { LoginFormData } from '../schemas/LoginSchema'
 import EyeOffIcon from '../components/icons/EyeOffIcon'
 import EyeIcon from '../components/icons/EyeIcon'
+import { LoginService } from '../service/AuthService'
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -40,12 +41,12 @@ const LoginScreen = () => {
   const onSubmit: SubmitHandler<LoginFormData> = async (data: any) => {
     try {
       setLoading(true);
-      // const response = await LoginService(data);
-      // if (response.status === 200) {
-      //   const token = response.data.token;
-      //   await SecureStore.setItemAsync('metadata', token);
-      //   navigation.navigate('Main');
-      // }
+      const response = await LoginService(data);
+      if (response.status === 200) {
+        const token = response.data.token;
+        await SecureStore.setItemAsync('metadata', token);
+        navigation.navigate('Home');
+      }
     } catch (error: any) {
       console.log('Login failed:', error.response?.data || error.message);
     } finally {

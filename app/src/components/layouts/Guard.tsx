@@ -17,18 +17,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const route = useRoute<RouteProp<RootStackParamList>>()
     const title = screenTitleMap[route.name] ?? route.name;
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     const token = await SecureStore.getItemAsync("metadata");
-  //     if (!token) {
-  //       navigation.reset({
-  //         index: 0,
-  //         routes: [{ name: "Login" }],
-  //       });
-  //     }
-  //   };
-  //   checkAuth();
-  // }, []);
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = await SecureStore.getItemAsync("metadata");
+      if (!token) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        });
+      }
+    };
+    checkAuth();
+  }, []);
 
   return (
     <View style={styles.container}>
