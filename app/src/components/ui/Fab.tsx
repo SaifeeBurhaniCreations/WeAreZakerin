@@ -89,7 +89,7 @@ const Fab = ({ position, color }: FabProps) => {
                         return (
                             <Animated.View key={index} style={{ transform: [{ scale }] }}>
                                 <Pressable
-                                    onPress={() => item.id === 0 ? dispatch(toggleModal(true)) : item.id === 1 ? dispatch(toggleAdminModal(true)) : navigation.navigate("ScheduleEvent") }
+                                    onPress={() => item.id === 0 ? dispatch(toggleModal(true)) : item.id === 1 ? dispatch(toggleAdminModal(true)) : item.id === 3 ? navigation.navigate("Piano") : navigation.navigate("ScheduleEvent") }
                                     onPressIn={handlePressIn}
                                     onPressOut={handlePressOut}
                                     style ={styles.fabItem}

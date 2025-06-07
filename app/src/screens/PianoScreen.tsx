@@ -6,8 +6,8 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import Metronome from '../components/ui/Mentronome';
 import { Audio } from 'expo-av';
 
-const whiteNotes = ["A", "B", 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-const blackNotes = ["A#", "B#", 'C#', 'D#', 'F#', 'G#', 'H#', 'I#', 'J#'];
+const whiteNotes = ["A", "B", 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
+const blackNotes = ["A#", "B#", 'C#', 'D#', 'F#', 'G#', 'H#', 'I#', 'J#', 'K#', 'L#', 'M#', 'N#'];
 
 const noteSoundFiles: Record<string, any> = {
   'A': require('@/src/assets/notes/A.mp3'),
@@ -20,6 +20,10 @@ const noteSoundFiles: Record<string, any> = {
   'H': require('@/src/assets/notes/ASharp.mp3'),
   'I': require('@/src/assets/notes/DSharp.mp3'),
   'J': require('@/src/assets/notes/GSharp.mp3'),
+  'K': require('@/src/assets/notes/GSharp.mp3'),
+  'L': require('@/src/assets/notes/GSharp.mp3'),
+  'M': require('@/src/assets/notes/GSharp.mp3'),
+  'N': require('@/src/assets/notes/GSharp.mp3'),
 };
 
 export default function PianoScreen() {
@@ -126,8 +130,10 @@ export default function PianoScreen() {
             note={note}
             type="white"
             isActive={activeNote === note}
-            onPress={() => onNotePress(note)}
+            onPressInCallback={() => setActiveNote(note)}
+            onPressOutCallback={() => setActiveNote(null)}
           />
+
         ))}
         {blackNotes.map((note, index) => (
           <PianoKey
@@ -135,9 +141,11 @@ export default function PianoScreen() {
             note={note}
             type="black"
             isActive={activeNote === note}
-            onPress={() => onNotePress(note)}
-            style={{ left: 75 * index + 60 }}
+            onPressInCallback={() => setActiveNote(note)}
+            onPressOutCallback={() => setActiveNote(null)}
+            style={{ left: 54 * index + 46 }}
           />
+
         ))}
       </View>
     </View>
