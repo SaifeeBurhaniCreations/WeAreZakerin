@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { validatePassword } = require('../utils/auth');
+const { validatePassword, hashPassword } = require('../utils/auth');
 const groupClient = require('../models/group')
 const userClient = require('../models/users')
 const jwt = require('jsonwebtoken')
@@ -7,61 +7,131 @@ const { roles_for_group: allowedRoles } = require('../utils/validateUtils');
 require('dotenv').config()
 
 // Middleware to check for token and extract user role
-const authenticate = (req, res, next) => {
-    const token = req.headers.authorization;
-    if (!token) {
+const authenticate = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
         return res.status(401).json({ message: 'Authorization token is required.' });
     }
 
+    const token = authHeader && authHeader.split(" ")[1].trim();
+
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET); // Assuming you have a JWT_SECRET in your .env
-        req.user = decoded; // Attach user info to request
+        const { userid } = decoded; // Attach user info to request
+        const user = await userClient.findOne({ userid })
+        req.user = user
         next();
     } catch (error) {
         return res.status(403).json({ message: 'Invalid token.' });
     }
 };
 
+
+// New route to get all groups
+router.get('/', authenticate, async (req, res) => {
+    try {
+        const groups = await groupClient.find({});
+        return res.status(200).json(groups);
+    } catch (error) {
+        console.error("Error getting all groups:", error);
+        return res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+});
+
+// New route to get group by ID
+router.get('/:groupId', authenticate, async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const group = await groupClient.findById(groupId);
+
+        if (!group) {
+            return res.status(404).json({ message: 'Group not found.' });
+        }
+
+        return res.status(200).json(group);
+    } catch (error) {
+        console.error("Error getting group by ID:", error);
+        return res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+});
+
 // Create Group Route
 router.post('/create', authenticate, async (req, res) => {
-    const { name, adminId, userDetails } = req.body;
-    const creatorRole = req.user.role; // Get role from decoded token
+    try {
+        const { name, adminId, userDetails } = req.body;
+        const creatorRole = req.user.role;
 
-    // Check if the requester has the right role
-    if (!allowedRoles.includes(creatorRole)) {
+        if (!allowedRoles.includes(creatorRole)) {
         return res.status(403).json({ message: 'Access denied. Only authorized roles can create a group.' });
-    }
+        }
 
-    // Check if the group already has an admin
-    const existingGroup = await groupClient.findOne({ name });
-    if (existingGroup && existingGroup.admin) {
-        return res.status(400).json({ message: 'Group already has an admin.' });
-    }
+        // Check for existing group
+        const [existingGroup, existingUser] = await Promise.all([
+            groupClient.findOne({ name }),
+            userDetails ? userClient.findOne({
+                $or: [
+                    { fullname: userDetails.fullname },
+                    { phone: userDetails.phone },
+                    { userid: userDetails.userid }
+                ]
+            }) : null
+        ]);
 
-    let groupAdmin;
+        if (existingGroup) {
+            return res.status(400).json({ message: 'Group with this name already exists.' });
+        }
 
-    // Determine how to assign the group admin
-    if (adminId) {
+        let groupAdmin;
+        let createdUser = null;
+
+        if (adminId) {
         const adminUser = await userClient.findById(adminId);
         if (!adminUser || !allowedRoles.includes(adminUser.role)) {
             return res.status(400).json({ message: 'Invalid admin ID. Must be an existing user with a valid role.' });
         }
         groupAdmin = adminId;
-    } else if (userDetails) {
-        const newUser = await userClient.create(userDetails);
-        groupAdmin = newUser._id;
-    } else {
+            createdUser = adminUser;
+        } else if (userDetails) {
+            if (existingUser) {
+                return res.status(400).json({ error: "User with the same fullname, phone, or userid already exists." });
+            }
+
+            const hashedPass = await hashPassword(String(userDetails.userid));
+
+            const newUserPayload = {
+                ...userDetails,
+                belongsto: name,
+                role: 'groupadmin',
+                title: 'tipper',
+                userpass: hashedPass,
+            };
+
+            createdUser = await userClient.create(newUserPayload);
+            groupAdmin = createdUser._id;
+        } else {
         return res.status(400).json({ message: 'Either adminId or userDetails must be provided.' });
+        }
+
+        const createGroup = {
+            name,
+            admin: groupAdmin,
+            members: [String(groupAdmin)], 
+        }
+
+        console.log(createGroup)
+
+        // Create the group
+        const newGroup = await groupClient.create(createGroup);
+
+        return res.status(201).json({
+            group: newGroup,
+            ...(createdUser && { user: createdUser }),
+        });
+
+    } catch (error) {
+        console.error("Error creating group:", error);
+        return res.status(500).json({ message: 'An internal server error occurred.' });
     }
-
-    // Create the group
-    const newGroup = await groupClient.create({
-        name,
-        admin: groupAdmin,
-        members: [],
-    });
-
-    return res.status(201).json(newGroup);
 });
 
 // Update Group Route

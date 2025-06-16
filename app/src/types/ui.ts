@@ -1,11 +1,13 @@
 import { ComponentType, ReactNode } from "react";
 import { TextInputProps } from "react-native";
 import { GestureResponderEvent, ImageSourcePropType } from "react-native";
+import { RootStackParamList } from "./navigation";
 
 export interface ButtonProps {
     onPress?: (event: GestureResponderEvent) => void;
     children: ReactNode;
     size?: "sm" | "md" | "lg" | "xl";
+    color?: "red" | "green" | "blue" | "yellow";
     full?: boolean;
     variant?: "fill" | "outline";
     disabled?: boolean;
@@ -15,23 +17,27 @@ export interface GroupCardProps {
     item: {
         name: string,
         admin: string,
-        member: string[] | number[],
+        members: string[] | number[],
         image: ImageSourcePropType;
-        tag: string;
+        tag: boolean;
+        id: string;
+        _id: string;
     },
     pressable?: boolean;
-    onPress?: () => void;
+    onPress?: keyof RootStackParamList;
 }
 export interface UserCardProps {
     item: {
-        name: string,
-        its: string,
+        fullname: string,
+        admin?: string;
+        me?: string;
+        userid: string,
         title: string,
         image: ImageSourcePropType;
-        tag: string;
+        tag: boolean;
     },
     pressable?: boolean;
-    onPress?: () => void;
+    onPress?: keyof RootStackParamList;
 }
 
 export interface TagProps {
@@ -119,9 +125,10 @@ export interface FebItemsProps {
 
     export interface GroupCardProps {
     id: string;
+    _id: string;
     image: ImageSourcePropType;
     name: string;
-    member: string[] | number[];
+    members: string[] | number[];
     admin: string;
     tag: string;
     }
@@ -129,19 +136,24 @@ export interface FebItemsProps {
 export interface GroupFlatListProps {
     groups : GroupCardProps[],
     pressable?: boolean, 
-    onPress?: () => void
+    onPress?: keyof RootStackParamList
 }
     export interface UserCardProps {
+    _id: string;
     id: string;
+    admin?: string;
+    me?: string;
     image: ImageSourcePropType;
-    name: string;
+    fullname: string;
     title: string;
-    its: string;
-    tag: string;
+    userid: string;
+    tag: boolean;
     }
 
 export interface UserFlatListProps {
         users: UserCardProps[],
-         pressable?: boolean,
-          onPress?: () => void,
+        admin: string,
+        me: string,
+        pressable?: boolean,
+        onPress?: keyof RootStackParamList,
 }

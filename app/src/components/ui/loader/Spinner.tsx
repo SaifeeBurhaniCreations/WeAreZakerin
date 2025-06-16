@@ -1,8 +1,8 @@
 import { Spinner as GlueSpinner } from "@/components/ui/spinner"
 import { getColor } from '@/src/constants/colors'
-const Spinner = () => {
+const Spinner = ({ size = 'large' }) => {
   return (
-    <GlueSpinner size="large" color={getColor("green", 200)} />
+    <GlueSpinner size={size} color={getColor("green", 200)} />
   )
 }
 

@@ -24,7 +24,15 @@ const getButtonStyle = (size: string) => {
   }
 };
 
-const Button = ({ children, variant = "fill", onPress, size = "lg", full, disabled }: ButtonProps) => {
+const Button = ({
+  children,
+  variant = "fill",
+  onPress,
+  size = "lg",
+  full,
+  disabled,
+  color = "green", // ✅ default color
+}: ButtonProps) => {
   const scale = new Animated.Value(1);
   const opacity = new Animated.Value(1); 
 
@@ -65,55 +73,45 @@ const Button = ({ children, variant = "fill", onPress, size = "lg", full, disabl
     opacity, 
   };
 
-  if (variant === "fill") {
-    return (
-      <Pressable
+  const containerStyle = {
+    alignSelf: full ? "stretch" : "center",
+    backgroundColor: variant === "fill"
+      ? disabled
+        ? getColor(color, 100)
+        : getColor(color)
+      : getColor("light"),
+    borderColor: getColor(color),
+    borderWidth: variant === "outline" ? 1 : 0,
+    borderRadius: 8,
+    alignItems: "center",
+  };
+
+  const textColor =
+    variant === "fill"
+      ? disabled
+        ? getColor(color, 200)
+        : getColor("light")
+      : getColor(color);
+
+  return (
+    <Pressable
       onPress={(event) => !disabled && onPress?.(event)}
-        onPressIn={ () => !disabled && handlePressIn()}
-        onPressOut={ () => !disabled && handlePressOut()}
-        style={[disabled ? styles.disabled : styles.baseFill, getButtonStyle(size), { alignSelf: full ? "stretch" : "center" }]}
-      >
-        <Animated.View style={animatedStyle}>
-          <Typography variant={getButtonFont(size)} color={disabled ? getColor("green", 200) : getColor("light")}>{children}</Typography>
-        </Animated.View>
-      </Pressable>
-    );
-  } else {
-    return (
-      <Pressable
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={[styles.baseOutline, getButtonStyle(size), { alignSelf: full ? "stretch" : "center" }]}
-      >
-        <Animated.View style={animatedStyle}>
-          <Typography variant={getButtonFont(size)} color={getColor("green")}>{children}</Typography>
-        </Animated.View>
-      </Pressable>
-    );
-  }
+      onPressIn={() => !disabled && handlePressIn()}
+      onPressOut={() => !disabled && handlePressOut()}
+      style={[containerStyle, getButtonStyle(size)]}
+    >
+      <Animated.View style={animatedStyle}>
+        <Typography variant={getButtonFont(size)} color={textColor}>
+          {children}
+        </Typography>
+      </Animated.View>
+    </Pressable>
+  );
 };
 
 export default Button;
 
 const styles = StyleSheet.create({
-  baseFill: {
-    backgroundColor: getColor("green"),
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  baseOutline: {
-    borderWidth: 1,
-    borderColor: getColor("green"),
-    backgroundColor: getColor("light"),
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  disabled: {
-    backgroundColor: getColor("green", 100),
-    borderRadius: 8,
-    alignItems: 'center',
-  },
   sm: {
     paddingVertical: 6,
     paddingHorizontal: 12,

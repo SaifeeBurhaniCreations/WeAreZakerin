@@ -4,26 +4,35 @@
   import Typography from '../../typography/Typography';
   import Tag from '../Tag';
   import React, { memo } from 'react';
+import useAppNavigation from '@/src/hooks/useAppNavigation';
 
-  const UserCard = ({ id, image, name, title, its, tag, pressable, onPress }: UserCardProps) => {
+const UserCard = ({ id, fullname, title, userid, pressable, onPress, admin, me }: UserCardProps) => {
+  const image = require('@/src/assets/images/users/user-1.png')
+  const { goTo } = useAppNavigation();
+
+  const handlePress = () => {
+    if (onPress) {
+      goTo(onPress, { id });
+    }
+  };
     const CardContent = () => (
-      <View style={[styles.Vstack, styles.gap4]}>
+      <View key={id} style={[styles.Vstack, styles.gap4]}>
         <Image source={image} style={styles.image} />
         <View style={styles.Hstack}>
-  <Typography
-    variant='h4'
-    color={getColor('green', 700)}
-    numberOfLines={1}
-    ellipsizeMode="tail"
-    style={styles.title}
-  >
-    {name}
-  </Typography>
-  {tag !== '' && <Tag size='sm'>Me</Tag>}
-</View>
+          <Typography
+            variant='h4'
+            color={getColor('green', 700)}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={styles.title}
+          >
+            {fullname}
+          </Typography>
+          {id === me ? <Tag size='sm'>Me</Tag> : id === admin && <Tag size='sm'>Admin</Tag>}
+        </View>
 
           <Typography variant='b4' color={getColor('green', 400)}>
-            {its} • {title}
+          {userid} • {title}
           </Typography>
       </View>
     );
@@ -33,7 +42,7 @@
         style={[
           styles.card
         ]}
-        onPress={onPress}
+        onPress={handlePress}
       >
         <CardContent />
       </Pressable>
