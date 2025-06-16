@@ -74,15 +74,14 @@ router.post("/authentication/login", async (req, res) => {
     const ITS = Number(userid)
 
     try {
-        const response_login_find = await userClient.find({ });
-        console.log(response_login_find)
+        const response_login_find = await userClient.find({userid: ITS});
         if (!response_login_find) {
             return res.status(401).json({ error: "Username or password is not valid." });
         }
-
+        
         const user = response_login_find;
 
-        if (typeof userpass !== 'string' || typeof user.userpass !== 'string') {
+        if (typeof userpass !== 'string' || typeof user[0].userpass !== 'string') {
             return res.status(400).json({ error: "Invalid password format" });
         }
 
