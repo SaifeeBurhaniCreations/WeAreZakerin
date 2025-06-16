@@ -1,25 +1,65 @@
 const router = require('express').Router();
-const { validatePassword } = require('../utils/auth');
+const { validatePassword, hashPassword } = require('../utils/auth');
 const userClient = require('../models/users')
+const groupClient = require('../models/group')
 const jwt = require('jsonwebtoken')
-const { allowedRoles } = require('../utils/validateUtils'); // Import allowed roles
+const { allowedRoles, roles_for_group } = require('../utils/validateUtils'); // Import allowed roles
 require('dotenv').config()
 
-router.get('/me', async (req, res) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from header
-    if (!token) {
-        return res.status(401).json({ error: "Token is required." });
+const authenticate = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ message: 'Authorization token is required.' });
     }
 
+    const token = authHeader && authHeader.split(" ")[1].trim();
+
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await userClient.findOne({ userid: decoded.userid });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Assuming you have a JWT_SECRET in your .env
+        const { userid } = decoded; // Attach user info to request
+        const user = await userClient.findOne({ userid })
+        req.user = user
+        next();
+    } catch (error) {
+        return res.status(403).json({ message: 'Invalid token.' });
+    }
+};
+
+
+router.get('/me', authenticate, async (req, res) => {
+
+    try {
+        const user = req.user
         if (!user) {
             return res.status(404).json({ error: "User not found." });
         }
-        return res.status(200).json({ user });
+        return res.status(200).json(user);
     } catch (error) {
         console.error("Error fetching user details:", error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+});
+
+router.get('/', authenticate, async (req, res) => {
+    try {
+        const users = await userClient.find();
+        // const filteredUsers = users.filter(user => user?._id.toString() !== req.user._id.toString());
+
+        return res.status(200).json(users);
+    } catch (error) {
+        console.error("Error fetching user count:", error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+});
+
+router.get('/fetch/:id', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params
+        const user = await userClient.findOne({ _id: id });
+        console.log(user)
+        return res.status(200).json(user);
+    } catch (error) {
+        console.error("Error fetching user count:", error);
         return res.status(500).json({ error: "Internal server error." });
     }
 });
@@ -74,8 +114,8 @@ router.post("/authentication/login", async (req, res) => {
     const ITS = Number(userid)
 
     try {
-        const response_login_find = await userClient.find({ });
-        console.log(response_login_find)
+        const response_login_find = await userClient.findOne({ userid: ITS });
+
         if (!response_login_find) {
             return res.status(401).json({ error: "Username or password is not valid." });
         }
@@ -86,11 +126,10 @@ router.post("/authentication/login", async (req, res) => {
             return res.status(400).json({ error: "Invalid password format" });
         }
 
-        // const passwordMatch = await validatePassword(userpass, user.userpass);
-        // const passwordMatch = true
-        // if (!passwordMatch) {
-        //     return res.status(401).json({ error: "Username or password is not valid." });
-        // }
+        const passwordMatch = await validatePassword(userpass, user.userpass);
+        if (!passwordMatch) {
+            return res.status(401).json({ error: "Username or password is not valid." });
+        }
 
         if (!process.env.JWT_SECRET) {
             console.error("JWT_SECRET is not defined in environment variables.");
@@ -104,39 +143,41 @@ router.post("/authentication/login", async (req, res) => {
     }
 });
 
-router.post('/create', async (req, res) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from header
-    if (!token) {
-        return res.status(401).json({ error: "Token is required." });
-    }
+router.post('/create', authenticate, async (req, res) => {
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const creator = await userClient.findOne({ userid: decoded.userid }); // Find the creator's details
-        if (!creator) {
-            return res.status(404).json({ error: "Creator not found." });
-        }
+
+        const creator = req.user
 
         // Check if the creator has permission to create a new user
-        if (!allowedRoles.includes(creator.role) || (creator.role === 'member' && req.body.role !== 'member')) {
+        if (!roles_for_group.includes(creator.role) || (creator.role === 'member' && req.body.role !== 'member')) {
             return res.status(403).json({ error: "You do not have permission to create this user." });
         }
 
         // Validate uniqueness of fullname, email, phone, and userid
-        const { fullname, email, phone, userid } = req.body;
-        const existingUser = await userClient.findOne({ $or: [{ fullname }, { email }, { phone }, { userid }] });
+        const { fullname, phone, userid, belongsto } = req.body;
+        const existingUser = await userClient.findOne({ $or: [{ fullname }, { phone }, { userid }] });
+
         if (existingUser) {
             return res.status(400).json({ error: "User with the same fullname, email, phone, or userid already exists." });
         }
 
+        const isGroupExist = await groupClient.findOne({ name: belongsto })
+        if (!isGroupExist) {
+            return res.status(400).json({ error: "Group dosen't exists." });
+        }
+
+        const hasedPass = await hashPassword(String(userid))
         // Create the new user
         const newUser = new userClient({
             ...req.body, // Spread the request body to create the user
+            userpass: hasedPass,
             createdat: Date.now(),
             updatedat: Date.now(),
         });
 
         await newUser.save(); // Save the new user to the database
+        await groupClient.updateOne({ name: belongsto }, { $push: { members: newUser?._id } })
         return res.status(201).json({ message: "User created successfully.", user: newUser });
     } catch (error) {
         console.error("Error creating user:", error);

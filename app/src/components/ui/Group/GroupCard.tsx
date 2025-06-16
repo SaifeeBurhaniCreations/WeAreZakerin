@@ -4,18 +4,44 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Typography from '../../typography/Typography';
 import Tag from '../Tag';
 import React, { memo } from 'react';
+import useAppNavigation from '@/src/hooks/useAppNavigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/src/redux/store';
 
-const GroupCard = ({ id, image, name, tag, admin, member, pressable, onPress }: GroupCardProps) => {
+const GroupCard = ({ id, name, admin, members = [], pressable, onPress }: GroupCardProps) => {
+
+  const image = require('@/src/assets/images/group/group.png')
+
+  const { goTo } = useAppNavigation();
+  const paramData = {
+    name,
+    id,
+    members,
+    admin
+  }
+
+  const { users } = useSelector((state: RootState) => state.users);
+
+  const getAdmin = users?.find(value => value?._id === admin)
+
+
+  const handlePress = () => {
+    if (onPress) {
+      goTo(onPress, paramData );
+    }
+  };
+
+
   const CardContent = () => (
-    <View style={styles.cardTitleContainer}>
+    <View key={id} style={styles.cardTitleContainer}>
       <Image source={image} style={styles.image} />
       <View style={styles.Vstack}>
         <View style={styles.Hstack}>
           <Typography variant='h4' color={getColor('green', 700)}>{name}</Typography>
-          {tag !== '' && <Tag size='sm'>Me</Tag>}
+          {/* {tag !== '' && <Tag size='sm'>Me</Tag>} */}
         </View>
         <Typography variant='b4' color={getColor('green', 400)}>
-          {admin} • {member.length} member{member.length !== 1 && 's'}
+          {getAdmin?.fullname} • {members.length} member{members.length !== 1 && 's'}
         </Typography>
       </View>
     </View>
@@ -27,7 +53,7 @@ const GroupCard = ({ id, image, name, tag, admin, member, pressable, onPress }: 
         styles.card,
         pressed && { transform: [{ scale: 0.97 }], opacity: 0.9 },
       ]}
-      onPress={onPress}
+      onPress={() => handlePress()}
     >
       <CardContent />
     </Pressable>

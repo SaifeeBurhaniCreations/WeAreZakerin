@@ -5,8 +5,8 @@ export type RootStackParamList = {
     Login: undefined;
     Landing: undefined;
     Loader: undefined;
-    Users: undefined;
-    Profile: undefined;
+    Users?: { name: string, members: string[], admin: string, id: string } | undefined;
+    Profile?: { id: string } | undefined;
     EditProfile: undefined;
     ScheduleEvent: undefined;
     Piano: undefined;

@@ -9,10 +9,16 @@ import { Image } from "react-native";
 import PageHeader from "../ui/PageHeader";
 
 import Fab from "../ui/Fab";
+import { handleFetchGroup } from "@/src/redux/slices/AddPartySlice";
+import { useDispatch } from "react-redux";
+import { fetchGroup } from "@/src/service/GroupService";
+import { handleFetchMe, handleFetchUser } from "@/src/redux/slices/UserSlice";
+import { fetchMe, fetchUser } from "@/src/service/UserService";
 
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
+  const dispatch = useDispatch();
 
     const route = useRoute<RouteProp<RootStackParamList>>()
     const title = screenTitleMap[route.name] ?? route.name;
@@ -20,6 +26,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       const token = await SecureStore.getItemAsync("metadata");
+      await fetchData(token!)
       if (!token) {
         navigation.reset({
           index: 0,
@@ -29,6 +36,27 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     };
     checkAuth();
   }, []);
+
+  const fetchGroupData = async (token: string) => {
+    const response = await fetchGroup(token!);
+    dispatch(handleFetchGroup(response.data))
+  }
+
+  const fetchUserData = async (token: string) => {
+    const response = await fetchUser(token!);
+    dispatch(handleFetchUser(response.data))
+  }
+
+  const fetchMyData = async (token: string) => {
+    const response = await fetchMe(token!);
+    dispatch(handleFetchMe(response.data))
+  }
+
+  const fetchData = async (token: string) => {
+    await fetchGroupData(token!)
+    await fetchUserData(token!)
+    await fetchMyData(token!)
+  }
 
   return (
     <View style={styles.container}>
