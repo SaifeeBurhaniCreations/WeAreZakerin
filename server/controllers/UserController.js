@@ -56,7 +56,6 @@ router.get('/fetch/:id', authenticate, async (req, res) => {
     try {
         const { id } = req.params
         const user = await userClient.findOne({ _id: id });
-        console.log(user)
         return res.status(200).json(user);
     } catch (error) {
         console.error("Error fetching user count:", error);
@@ -85,24 +84,52 @@ router.get('/count/:group', async (req, res) => {
     }
 });
 
-router.delete('/remove', async (req, res) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from header
-    if (!token) {
-        return res.status(401).json({ error: "Token is required." });
+router.delete('/remove/:id', authenticate, async (req, res) => {
+    const { id } = req.params;
+
+    const creator = req.user
+
+    // Check if the creator has permission to create a new user
+    if (!roles_for_group.includes(creator.role) || (creator.role === 'member' && req.body.role !== 'member')) {
+        return res.status(403).json({ error: "You do not have permission to create this user." });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const result = await userClient.deleteOne({ userid: decoded.userid });
-        if (result.deletedCount === 0) {
+
+        // Find the user by ID param
+        const user = await userClient.findOne({ userid: id });
+        if (!user) {
             return res.status(404).json({ error: "User not found." });
         }
+
+        // Check if the user belongs to a group
+        if (user?.belongsto !== '') {
+            const group = await groupClient.findOne({ name: user?.belongsto });
+
+            if (group) {
+                // Remove user from members array
+                await groupClient.updateOne(
+                    { name: user?.belongsto },
+                    { $pull: { members: user?._id } }
+                );
+            }
+        }
+
+        // Delete the user
+        const result = await userClient.deleteOne({ userid: id });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: "User deletion failed." });
+        }
+
         return res.status(200).json({ message: "User deleted successfully." });
+
     } catch (error) {
         console.error("Error deleting user:", error);
         return res.status(500).json({ error: "Internal server error." });
     }
 });
+
 
 router.post("/authentication/login", async (req, res) => {
     let { userid, userpass } = req.body;

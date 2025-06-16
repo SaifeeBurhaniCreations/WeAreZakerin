@@ -35,4 +35,14 @@ const fetchUserById = async (id: string) => {
     });
 };
 
-export { createUser, fetchUser, fetchUserById, fetchMe };
+const removeUser = async (id: string) => {
+    // return {status: 200}
+    const token = await SecureStore.getItemAsync("metadata");
+    return api.delete(`/users/remove/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+};
+
+export { createUser, fetchUser, fetchUserById, fetchMe, removeUser};

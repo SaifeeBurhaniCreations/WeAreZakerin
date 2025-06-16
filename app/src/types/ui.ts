@@ -7,6 +7,7 @@ export interface ButtonProps {
     onPress?: (event: GestureResponderEvent) => void;
     children: ReactNode;
     size?: "sm" | "md" | "lg" | "xl";
+    color?: "red" | "green" | "blue" | "yellow";
     full?: boolean;
     variant?: "fill" | "outline";
     disabled?: boolean;

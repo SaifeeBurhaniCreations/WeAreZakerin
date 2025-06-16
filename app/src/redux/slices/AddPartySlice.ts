@@ -61,9 +61,27 @@ const AddPartySlice = createSlice({
         groupToUpdate.members.push(id?._id);
       }
     },
+    handleRemoveMemberFromGroup: (state, action) => {
+      const { name, id } = action.payload; // 'id' can be a string (user id) or an object with _id
+    
+    const groupToUpdate = state.groups.find((group) => group.name === name);
+    
+    if (groupToUpdate) {
+      const memberId = id;
+      console.log(groupToUpdate.members.filter(
+        (memberIdInGroup) => memberIdInGroup !== memberId
+      ));
+    
+        // Filter out the member with the matching ID
+        groupToUpdate.members = groupToUpdate.members.filter(
+          (memberIdInGroup) => memberIdInGroup !== memberId
+        );
+      }
+    }
+    
   },
 });
 
-export const { toggleModal, handleFetchGroup, handleAddGroup, handleUpdateGroup, handleDeleteGroup, handleAddMemberInGroup } =
+export const { toggleModal, handleFetchGroup, handleAddGroup, handleUpdateGroup, handleDeleteGroup, handleAddMemberInGroup, handleRemoveMemberFromGroup } =
   AddPartySlice.actions;
 export default AddPartySlice.reducer;

@@ -37,11 +37,6 @@ const UsersScreen = () => {
     const { users, me } = useSelector((state: RootState) => state.users);
     const { groups } = useSelector((state: RootState) => state.modal);
 
-    // const users = useMemo(() => [
-    //     { id: '1', image: require('@/src/assets/images/users/user-1.png'), name: "Aliasger Barood", title: "Support", its: "30532154", tag: "me" },
-    //     { id: '2', image: require('@/src/assets/images/users/user-1.png'), name: "Jafarussadiq chandbhai", title: "Tipper", its: "30862154", tag: "" },
-    //     { id: '3', image: require('@/src/assets/images/users/user-1.png'), name: "Mohammad banduk", title: "Support", its: "30905321", tag: "" },
-    // ], []) as UserCardProps[];
     const getGroup = groups?.find(value => value.name === name)
     const { members } = getGroup || []
 
