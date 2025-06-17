@@ -133,7 +133,7 @@ router.delete('/remove/:id', authenticate, async (req, res) => {
 
 router.post("/authentication/login", async (req, res) => {
     let { userid, userpass } = req.body;
-
+    
     if (!userid || !userpass) {
         return res.status(400).json({ error: "Username and password are required." });
     }
@@ -148,8 +148,8 @@ router.post("/authentication/login", async (req, res) => {
         }
         
         const user = response_login_find;
-
-        if (typeof userpass !== 'string' || typeof user[0].userpass !== 'string') {
+        
+        if (typeof userpass !== 'string' || typeof user.userpass !== 'string') {
             return res.status(400).json({ error: "Invalid password format" });
         }
 

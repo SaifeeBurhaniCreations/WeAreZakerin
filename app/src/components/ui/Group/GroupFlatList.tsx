@@ -19,7 +19,7 @@ const GroupFlatList = ({ groups, pressable, onPress }: GroupFlatListProps) => {
   return (
     <FlatList
       data={groups}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item._id}
       renderItem={({ item }) => (
         <GroupCard
         key={item?._id}

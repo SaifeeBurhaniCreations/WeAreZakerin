@@ -1,12 +1,18 @@
+import { RootStackParamList } from "@/src/types";
 import { createSlice } from "@reduxjs/toolkit";
+import { ImageSourcePropType } from "react-native";
 
-interface Group {
+export interface Group {
+  id: string;
+  _id: string;
+  image: ImageSourcePropType;
   name: string;
   members: string[];
-  _id: string;
-  id: string;
   admin: string;
-}
+  tag: string;
+  pressable?: boolean, 
+    onPress?: keyof RootStackParamList;
+  }
 
 interface AddPartyState {
   isModalOpen: boolean;

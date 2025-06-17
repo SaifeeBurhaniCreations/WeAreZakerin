@@ -7,8 +7,9 @@ import React, { memo } from 'react';
 import useAppNavigation from '@/src/hooks/useAppNavigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/src/redux/store';
+import { Group } from '@/src/redux/slices/AddPartySlice';
 
-const GroupCard = ({ id, name, admin, members = [], pressable, onPress }: GroupCardProps) => {
+const GroupCard = ({ id, name, admin, members = [], pressable, onPress }: Group) => {
 
   const image = require('@/src/assets/images/group/group.png')
 

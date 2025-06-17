@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import Typography from '../typography/Typography';
 import { ButtonProps } from '@/src/types';
 import { getColor } from '@/src/constants/colors';
+import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 
 const getButtonFont = (size: string) => {
   switch (size) {
@@ -73,7 +74,7 @@ const Button = ({
     opacity, 
   };
 
-  const containerStyle = {
+  const containerStyle: ViewStyle = {
     alignSelf: full ? "stretch" : "center",
     backgroundColor: variant === "fill"
       ? disabled

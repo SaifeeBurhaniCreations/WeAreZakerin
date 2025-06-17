@@ -48,7 +48,7 @@
     "@shopify/react-native-skia": "^2.0.1",
     "@umalqura/core": "^0.0.7",
     "app": "file:",
-    "axios": "^1.5.1",
+    "axios": "^1.10.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "dayjs": "^1.11.13",
     "expo": "~52.0.46",

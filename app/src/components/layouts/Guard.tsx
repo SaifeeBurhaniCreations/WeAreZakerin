@@ -49,6 +49,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const fetchMyData = async (token: string) => {
     const response = await fetchMe(token!);
+    // console.log(response.data);
+    
     dispatch(handleFetchMe(response.data))
   }
 

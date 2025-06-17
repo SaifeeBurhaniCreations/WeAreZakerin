@@ -22,8 +22,7 @@ const AddPartyModal = () => {
     const [selectedValue, setSelectedValue] = useState<string>("");
     const { users } = useSelector((state: RootState) => state.users);
 
-    const filterAdmins = users?.filter(value => value?.belongsto === '' && value?.roles !== 'member')
-
+    const filterAdmins = users?.filter(value => value?.belongsto === '' && value?.role !== 'member')
 
     const {
         control,

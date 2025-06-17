@@ -4,14 +4,13 @@ import UserFlatList from '../components/ui/User/UserFlatList';
 import Typography from '../components/typography/Typography';
 import Button from '../components/ui/Button';
 import { useEffect, useRef, useState } from 'react';
-import { AddDataModalRef, UserCardProps } from '../types';
+import { AddDataModalRef } from '../types';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import BottomSheetModal from '../components/ui/modals/BottomSheetModal';
 import Switch from '../components/ui/Switch';
 import { RootStackParamList } from '../types';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import Overlay from "../components/ui/Overlay";
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
@@ -19,26 +18,61 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import userSchema, { UserFormData } from '../schemas/UserSchema';
 import { createUser, fetchUserById } from '../service/UserService';
-import { handleAddUser } from '../redux/slices/UserSlice';
+import { handleAddUser, User } from '../redux/slices/UserSlice';
 import { handleAddMemberInGroup } from '../redux/slices/AddPartySlice';
-
-type UserScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>;
+import initialUserImage from '@/src/assets/images/users/user-1.png'
 type UserScreenRouteProp = RouteProp<RootStackParamList, 'Users'>;
 
 const UsersScreen = () => {
-    const navigation = useNavigation<UserScreenNavigationProp>();
     const dispatch = useDispatch();
     const route = useRoute<UserScreenRouteProp>();
     const modalRef = useRef<AddDataModalRef>(null);
     const [loading, setLoading] = useState(false);
-    const [allMembers, setAllMembers] = useState([]);
-    const [adminData, setAdminData] = useState({});
+    const [allMembers, setAllMembers] = useState<User[]>([]);
+    const [adminData, setAdminData] = useState<User>({
+        id: '',
+        _id: '',
+        userid: '',
+        userpass: '',
+        fullname: '',
+        phone: '',
+        email: '',
+        title: '',
+        grade: '',
+        address: '',
+        belongsto: '',
+        role: 'member',
+        attendence: [],
+        createdat: '',
+        updatedat: '',
+        profileImage: { s3Key: '', s3Url: '' },
+        image: initialUserImage,
+        tag: false,
+        admin: '',
+        me: '',
+    });
+
     const { name, admin } = route.params || {};
     const { users, me } = useSelector((state: RootState) => state.users);
     const { groups } = useSelector((state: RootState) => state.modal);
 
     const getGroup = groups?.find(value => value.name === name)
-    const { members } = getGroup || []
+    const members = getGroup?.members || [];
+
+    useEffect(() => {
+        if (users && members?.length > 0) {
+            const mapped = users
+                ?.filter(user => members?.includes(user?._id))
+                .map(user => ({
+                    ...user,
+                    id: user._id,
+                    tag: user._id === admin, 
+                    image: { uri: user.profileImage?.s3Url || '' } 
+                }));
+            setAllMembers(mapped);
+        }
+    }, [users, members]);
+
 
     useEffect(() => {
         if (admin) {
@@ -70,8 +104,8 @@ const UsersScreen = () => {
             fullname: "",
             phone: "",
             address: "",
-            belongsto: name, // Pre-fill belongsto
-            role: "member",   // default role
+            belongsto: name, 
+            role: "member", 
         },
     });
 
@@ -112,7 +146,7 @@ const UsersScreen = () => {
                     size="sm"
                     variant='outline'
                     onPress={() => {
-                        reset(); // Clear previous inputs
+                        reset(); 
                         modalRef.current?.open();
                     }}
                 >
@@ -122,8 +156,8 @@ const UsersScreen = () => {
 
             <UserFlatList
                 users={allMembers}
-                admin={adminData?._id}
-                me={me ? me?._id : null}
+                admin={adminData?._id || ""}
+                me={me?._id || ""}
                 pressable
                 onPress="Profile"
             />
@@ -132,7 +166,7 @@ const UsersScreen = () => {
                 title={"Add new member"}
                 ref={modalRef}
                 footer="Add"
-                onPress={handleSubmit(onSubmit)} // bind to handleSubmit
+                onPress={handleSubmit(onSubmit)}
             >
                 <Controller
                     control={control}

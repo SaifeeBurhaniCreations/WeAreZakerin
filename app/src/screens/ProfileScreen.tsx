@@ -1,5 +1,5 @@
 import { Image, ScrollView, StyleSheet, View } from 'react-native'
-import { Modal, Pressable, Text } from 'react-native';
+import { Modal } from 'react-native';
 import { getColor } from '../constants/colors'
 import avatar from "@/src/assets/images/users/user-1.png"
 import Typography from '../components/typography/Typography'
@@ -7,8 +7,7 @@ import MisqaatIcon from '../components/icons/MisqaatIcon'
 import LocationIcon from '../components/icons/LocationIcon'
 import Button from '../components/ui/Button'
 import Tag from '../components/ui/Tag'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from '../types'
 import MailIcon from '../components/icons/MailIcon'
 import PhoneIcon from '../components/icons/PhoneIcon'
@@ -23,28 +22,43 @@ import { handleRemoveUser } from '../redux/slices/UserSlice';
 import { handleRemoveMemberFromGroup } from '../redux/slices/AddPartySlice';
 
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
 type ProfileRouteProp = RouteProp<RootStackParamList, 'Profile'>;
 
 const ProfileScreen = () => {
-  const navigation = useNavigation<ProfileScreenNavigationProp>();
   const route = useRoute<ProfileRouteProp>();
-
-  const { id } = route.params || {};
+  const id = route?.params?.id;
+  
   const { users } = useSelector((state: RootState) => state.users);
   const { groups } = useSelector((state: RootState) => state.modal);
+  const selectedUser = users?.find(value => value?._id === id);
 
-  const seletedUser = users?.find(value => value?._id === id)
-  const {fullname, userid, address, title, phone, belongsto, _id} = seletedUser!
+  const { fullname, userid, address, title, phone, belongsto, _id } = selectedUser || {};
   
+  const userGroup = groups?.find(value => value.name === belongsto);
   
-  const userGroup = groups?.find(value => value.name === belongsto)
   const [, , removeMetaData] = useSecureStorageState<any>('metadata', null);
   const { resetTo, goTo } = useAppNavigation();
   const dispatch = useDispatch();
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // if (!id) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+  //       <Typography variant="h5" color="red">No user ID provided.</Typography>
+  //     </View>
+  //   );
+  // }
+  
+  // if (!selectedUser) {
+  //   return (
+  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+  //       <Typography variant="h5" color="red">User not found.</Typography>
+  //     </View>
+  //   );
+  // }
+  
 
 
   const handleLogout = async() => {
@@ -53,13 +67,19 @@ const ProfileScreen = () => {
   }
 
   const handleConfirmDelete = async() => {
+    if (!userid) return;
+    
+    setLoading(true);
+
     const response = await removeUser(userid)
+
     setLoading(true)
     if(response.status === 200) {
       setLoading(false)
       
       setTimeout(()=>{dispatch(handleRemoveUser(userid))}, 2000)
       dispatch(handleRemoveMemberFromGroup({ name: userGroup?.name, id: _id }))
+      
       goTo("Users", userGroup)
       setShowDeleteModal(false);
     }
@@ -72,7 +92,7 @@ const ProfileScreen = () => {
         <View style={styles.Vstack}>
           <View style={[styles.Hstack, { justifyContent: 'space-between', width: '100%' }]}>
             <Image source={avatar} style={styles.avatar} />
-            <Button size='sm' onPress={() => navigation.navigate("EditProfile")}>Edit profile</Button>
+            <Button size='sm' onPress={() => goTo("EditProfile")}>Edit profile</Button>
           </View>
           <View style={[styles.Hstack]}>
             <Typography variant="h4" color={getColor("green", 700)}>{fullname!}</Typography>
@@ -168,7 +188,6 @@ const styles = StyleSheet.create({
   borderB: {
     borderBottomWidth: 0.5,
     borderBottomColor: getColor('green'),
-    // paddingTop: 8,
     paddingBottom: 8,
   },
   justifyBetween: {

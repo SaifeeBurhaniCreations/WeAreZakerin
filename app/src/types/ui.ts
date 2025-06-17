@@ -2,6 +2,8 @@ import { ComponentType, ReactNode } from "react";
 import { TextInputProps } from "react-native";
 import { GestureResponderEvent, ImageSourcePropType } from "react-native";
 import { RootStackParamList } from "./navigation";
+import { User } from "../redux/slices/UserSlice";
+import { Group } from "../redux/slices/AddPartySlice";
 
 export interface ButtonProps {
     onPress?: (event: GestureResponderEvent) => void;
@@ -134,7 +136,7 @@ export interface FebItemsProps {
     }
 
 export interface GroupFlatListProps {
-    groups : GroupCardProps[],
+    groups : Group[],
     pressable?: boolean, 
     onPress?: keyof RootStackParamList
 }
@@ -151,9 +153,14 @@ export interface GroupFlatListProps {
     }
 
 export interface UserFlatListProps {
-        users: UserCardProps[],
+        users: User[],
         admin: string,
         me: string,
         pressable?: boolean,
         onPress?: keyof RootStackParamList,
+}
+
+
+export interface UserAbc {
+    
 }
