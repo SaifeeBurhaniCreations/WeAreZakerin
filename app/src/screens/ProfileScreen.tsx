@@ -17,10 +17,26 @@ import { useSecureStorageState } from '../hooks/useSecureStorageState'
 import useAppNavigation from '../hooks/useAppNavigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { removeUser } from '../service/UserService';
 import { handleRemoveUser } from '../redux/slices/UserSlice';
 import { handleRemoveMemberFromGroup } from '../redux/slices/AddPartySlice';
+
+const NavigationComp = () => {
+  const { goTo } = useAppNavigation();
+
+  useEffect(() => {
+      goTo('Home');
+  }, []);
+
+  return (
+    <View>
+      <Typography variant='b3'>
+        No Data
+      </Typography>
+    </View>
+  )
+}
 
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
@@ -33,14 +49,25 @@ const ProfileScreen = () => {
   const { id } = route.params || {};
   const { users } = useSelector((state: RootState) => state.users);
   const { groups } = useSelector((state: RootState) => state.modal);
-
+  
+  const { resetTo, goTo } = useAppNavigation();
   const seletedUser = users?.find(value => value?._id === id)
+
+  useEffect(() => {
+    if (!seletedUser) {
+      goTo('Home');
+    }
+  }, [seletedUser]);
+
+  if (!seletedUser) {
+    return <NavigationComp />
+  }
+
   const {fullname, userid, address, title, phone, belongsto, _id} = seletedUser!
   
   
   const userGroup = groups?.find(value => value.name === belongsto)
   const [, , removeMetaData] = useSecureStorageState<any>('metadata', null);
-  const { resetTo, goTo } = useAppNavigation();
   const dispatch = useDispatch();
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -58,7 +85,7 @@ const ProfileScreen = () => {
     if(response.status === 200) {
       setLoading(false)
       
-      setTimeout(()=>{dispatch(handleRemoveUser(userid))}, 2000)
+      // setTimeout(()=>{dispatch(handleRemoveUser(userid))}, 2000)
       dispatch(handleRemoveMemberFromGroup({ name: userGroup?.name, id: _id }))
       goTo("Users", userGroup)
       setShowDeleteModal(false);

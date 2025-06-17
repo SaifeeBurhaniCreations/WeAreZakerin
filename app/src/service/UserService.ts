@@ -36,7 +36,7 @@ const fetchUserById = async (id: string) => {
 };
 
 const removeUser = async (id: string) => {
-    // return {status: 200}
+    return {status: 200}
     const token = await SecureStore.getItemAsync("metadata");
     return api.delete(`/users/remove/${id}`, {
         headers: {
