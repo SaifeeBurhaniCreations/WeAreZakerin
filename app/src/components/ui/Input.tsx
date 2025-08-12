@@ -3,6 +3,8 @@ import { InputProps } from '@/src/types'
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 import Typography from '../typography/Typography';
 import ClockIcon from '../icons/ClockIcon';
+import Calendar from '@/src/screens/ScheduleEventScreen';
+import Calendar12Icon from '../icons/Calendar12Icon';
 
 const Input = ({
     children,
@@ -31,7 +33,7 @@ const Input = ({
         return (
           <Pressable onPress={onPress} style={styles.icon}>
             {isString ? <Typography variant='b3'>{icon}</Typography> : icon}
-            {mask === "time" && <ClockIcon />}
+            {mask === "time" ? <ClockIcon /> : mask === "date" && <Calendar12Icon />}
           </Pressable>
         );
       };
@@ -54,6 +56,7 @@ const Input = ({
             secureTextEntry={secureTextEntry}
             keyboardType={keyboardType}
             maxLength={maxLength}
+            pointerEvents={mask === "date" || mask === "time" ? "none" : undefined}
             {...props}
         />
         </View>
@@ -65,7 +68,7 @@ const Input = ({
           { borderColor: error ? getColor("red", 300) : getColor(color, 100) },
           style
         ]}>
-          {!post && (icon || mask === "time") && renderIcon(icon, onIconPress)}
+          {!post && (icon || mask === "time" || mask === "date") && renderIcon(icon, onIconPress)}
           {!post && addonText && renderAddonText(addonText)}
       
           <TextInput
@@ -80,6 +83,7 @@ const Input = ({
             secureTextEntry={secureTextEntry}
             keyboardType={keyboardType}
             maxLength={maxLength}
+            pointerEvents={mask === "date" || mask === "time" ? "none" : undefined}
             {...props}
           />
       

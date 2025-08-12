@@ -4,16 +4,13 @@ import landingBg from '@/src/assets/images/landing-image.jpg'
 import Button from '@/src/components/ui/Button'
 import Typography from '../components/typography/Typography'
 import { getColor } from '../constants/colors'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from '../types'
 import Logo from '../components/ui/Logo'
+import useAppNavigation from '../hooks/useAppNavigation'
 
-export type LandingScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 const LandingScreen = () => {
-    const navigation = useNavigation<LandingScreenNavigationProp>();
-
+    const { goTo } = useAppNavigation();
+    
     return (
         <ImageBackground source={landingBg} style={styles.background}>
             <View style={styles.overlay}>
@@ -28,7 +25,7 @@ const LandingScreen = () => {
                         </Typography>
                     </Typography>
 
-                    <Button full onPress={() => navigation.navigate("Login")}>Login</Button>
+                    <Button full onPress={() => goTo("Login")}>Login</Button>
                 </View>
             </View>
         </ImageBackground>

@@ -2,10 +2,10 @@ import { IconProps } from "@/src/types"
 import * as React from "react"
 import Svg, { Path } from "react-native-svg"
 
-const AdminIcon: React.FC<IconProps> = ({ color = "#fff", size = 32, style, ...props }) => {
+const AdminIcon: React.FC<IconProps> = ({ color = "#fff", size = 24, style, ...props }) => {
 
   return (
-    <Svg
+  <Svg 
     stroke={color}
     fill={color}
     strokeWidth={0}
@@ -14,11 +14,8 @@ const AdminIcon: React.FC<IconProps> = ({ color = "#fff", size = 32, style, ...p
     width={size}
     {...props}
   >
-    <Path
-      d="M12 14v2a6 6 0 00-6 6H4a8 8 0 018-8zm0-1c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm0-2c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm9 6h1v5h-8v-5h1v-1a3 3 0 116 0v1zm-2 0v-1a1 1 0 10-2 0v1h2z"
-      stroke="none"
-    />
-  </Svg>
+    <Path d="M12 14V22H4C4 17.5817 7.58172 14 12 14ZM12 13C8.685 13 6 10.315 6 7C6 3.685 8.685 1 12 1C15.315 1 18 3.685 18 7C18 10.315 15.315 13 12 13ZM21 17H22V22H14V17H15V16C15 14.3431 16.3431 13 18 13C19.6569 13 21 14.3431 21 16V17ZM19 17V16C19 15.4477 18.5523 15 18 15C17.4477 15 17 15.4477 17 16V17H19Z"></Path>
+    </Svg>
   )
 }
 

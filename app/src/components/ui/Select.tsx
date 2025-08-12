@@ -13,7 +13,7 @@ import { ChevronDownIcon } from "@/components/ui/icon";
 import { SelectProps } from "@/src/types";
 import { useWindowDimensions } from "react-native";
 
-const Select = ({ options, placeholder = "Select", onSelect, value }: SelectProps) => {
+const Select = ({ options, placeholder = "Select", onSelect, value, style }: SelectProps) => {
     const [visible, setVisible] = useState(false);
     const { width, height } = useWindowDimensions();
     const isLandscape = width > height;
@@ -22,7 +22,7 @@ const Select = ({ options, placeholder = "Select", onSelect, value }: SelectProp
         options.find((option) => option.value === value)?.label || placeholder;
 
     return (
-        <View>
+        <View style={style}>
             <Pressable style={styles.trigger} onPress={() => setVisible(true)}>
                 <Text style={styles.triggerText}>{selectedLabel}</Text>
                 <ChevronDownIcon width={24} height={24} />

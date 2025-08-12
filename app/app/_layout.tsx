@@ -19,6 +19,7 @@ import ProfileScreen from '@/src/screens/ProfileScreen';
 import EditProfileScreen from '@/src/screens/EditProfileScreen';
 import ScheduleEventScreen from '@/src/screens/ScheduleEventScreen';
 import PianoScreen from "@/src/screens/PianoScreen";
+import { ToastRoot } from "@/src/utils/Toast";
 
 const Stack = createStackNavigator();
 
@@ -52,9 +53,10 @@ export default function RootLayout() {
       </Suspense>
     );
   }
-
+  
   return (
     <Provider store={store}>
+    <ToastRoot />
     <GluestackUIProvider mode="light">
       <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
         <StatusBar backgroundColor={getColor("green")} style="light" />

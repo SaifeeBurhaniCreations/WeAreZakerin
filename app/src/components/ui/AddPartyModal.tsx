@@ -13,17 +13,17 @@ import { PartyFormData, partySchema } from "@/src/schemas/PartySchema";
 import { createGroup } from "@/src/service/GroupService";
 import Button from "./Button";
 import { handleAddUser } from "@/src/redux/slices/UserSlice";
+import { Toast } from "@/src/utils/Toast";
 
 const AddPartyModal = () => {
     const dispatch = useDispatch();
     const modalRef = useRef<AddDataModalRef>(null);
-    const { isModalOpen } = useSelector((state: RootState) => state.modal);
+    const { isModalOpen } = useSelector((state: RootState) => state.party);
     const [loading, setLoading] = useState(false);
     const [selectedValue, setSelectedValue] = useState<string>("");
     const { users } = useSelector((state: RootState) => state.users);
 
-    const filterAdmins = users?.filter(value => value?.belongsto === '' && value?.roles !== 'member')
-
+    const filterAdmins = users?.filter(value => value?.belongsto === '' && value?.role !== 'member')
 
     const {
         control,
@@ -70,6 +70,11 @@ const AddPartyModal = () => {
             const response = await createGroup(payload);
             // console.log(response.data)
             if (response.status === 201) {
+                Toast.show({
+                    title: 'Add',
+                    description: 'Party Added Successfully!',
+                    variant: 'success',
+                });
                 dispatch(toggleModal(false));
                 dispatch(handleAddGroup(response.data?.group));
                 if(response?.data?.user) {

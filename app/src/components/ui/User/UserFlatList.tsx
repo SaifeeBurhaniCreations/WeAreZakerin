@@ -12,7 +12,6 @@ const cardWidth = (screenWidth - spacing * 3) / 2;
 const UserFlatList = ({users, pressable, onPress, admin, me } : UserFlatListProps) => {
   const [loading, setLoading] = useState(false);
 
-
   const handleLoadMore = () => {
     if (!loading) {
       setLoading(false);

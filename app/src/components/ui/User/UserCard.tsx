@@ -5,8 +5,9 @@
   import Tag from '../Tag';
   import React, { memo } from 'react';
 import useAppNavigation from '@/src/hooks/useAppNavigation';
+import { User } from '@/src/redux/slices/UserSlice';
 
-const UserCard = ({ id, fullname, title, userid, pressable, onPress, admin, me }: UserCardProps) => {
+const UserCard = ({ id, fullname, title, userid, pressable, onPress, admin, me }: User) => {
   const image = require('@/src/assets/images/users/user-1.png')
   const { goTo } = useAppNavigation();
 

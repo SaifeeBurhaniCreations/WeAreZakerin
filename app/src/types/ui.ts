@@ -1,7 +1,10 @@
 import { ComponentType, ReactNode } from "react";
-import { TextInputProps } from "react-native";
+import { TextInputProps, ViewStyle } from "react-native";
 import { GestureResponderEvent, ImageSourcePropType } from "react-native";
 import { RootStackParamList } from "./navigation";
+import { User } from "../redux/slices/UserSlice";
+import { Group } from "../redux/slices/AddPartySlice";
+
 
 export interface ButtonProps {
     onPress?: (event: GestureResponderEvent) => void;
@@ -11,6 +14,7 @@ export interface ButtonProps {
     full?: boolean;
     variant?: "fill" | "outline";
     disabled?: boolean;
+    style?: ViewStyle
 }
 
 export interface GroupCardProps {
@@ -76,7 +80,7 @@ export interface InputProps extends TextInputProps {
     secureTextEntry?: boolean;
     keyboardType?: TextInputProps['keyboardType'];
     maxLength?: number;
-    mask?: "time";
+    mask?: "time" | "date";
     onIconPress?: () => void;  
     style?: any;  
 }
@@ -92,12 +96,14 @@ export type SelectProps = {
     placeholder?: string;
     onSelect: (value: string) => void;
     value?: string;
+    style?: ViewStyle;
 };
 
 export interface IconProps {
     color?: string;
     size?: number;
     style?: any;
+    onPress?: () => void;
 }
 
 export interface SwitchProps {
@@ -134,7 +140,7 @@ export interface FebItemsProps {
     }
 
 export interface GroupFlatListProps {
-    groups : GroupCardProps[],
+    groups : Group[],
     pressable?: boolean, 
     onPress?: keyof RootStackParamList
 }
@@ -151,9 +157,14 @@ export interface GroupFlatListProps {
     }
 
 export interface UserFlatListProps {
-        users: UserCardProps[],
+        users: User[],
         admin: string,
         me: string,
         pressable?: boolean,
         onPress?: keyof RootStackParamList,
+}
+
+
+export interface UserAbc {
+    
 }

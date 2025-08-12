@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, TextInput, View } from 'react-native'
+import { Dimensions, StyleSheet, View } from 'react-native'
 import { getColor } from '../constants/colors'
 import Typography from '../components/typography/Typography'
 import Logo from '../components/ui/Logo'
@@ -6,7 +6,6 @@ import Button from '../components/ui/Button'
 import { useState } from 'react'
 import { RootStackParamList } from '../types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useNavigation } from "@react-navigation/native";
 import { renderHexagonRow } from '../utils/hexagonUtils'
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,17 +15,16 @@ import loginSchema, { LoginFormData } from '../schemas/LoginSchema'
 import EyeOffIcon from '../components/icons/EyeOffIcon'
 import EyeIcon from '../components/icons/EyeIcon'
 import { LoginService } from '../service/AuthService'
+import useAppNavigation from '../hooks/useAppNavigation'
+import { Toast } from '../utils/Toast'
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
-const loginDB = [
-{userid: "10203040", name: "Aliasger Baroor",  }
-]
-
 const LoginScreen = () => {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const { goTo } = useAppNavigation();
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -43,9 +41,14 @@ const LoginScreen = () => {
       setLoading(true);
       const response = await LoginService(data);
       if (response.status === 200) {
+        Toast.show({
+          title: 'Login',
+          description: 'Welcome Back!',
+          variant: 'success',
+        });
         const token = response.data.token;
         await SecureStore.setItemAsync('metadata', token);
-        navigation.navigate('Home');
+        goTo('Home');
       }
     } catch (error: any) {
       console.log('Login failed:', error.response?.data || error.message);

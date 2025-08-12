@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import Typography from '../typography/Typography';
 import { ButtonProps } from '@/src/types';
 import { getColor } from '@/src/constants/colors';
+import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 
 const getButtonFont = (size: string) => {
   switch (size) {
@@ -31,7 +32,8 @@ const Button = ({
   size = "lg",
   full,
   disabled,
-  color = "green", // ✅ default color
+  style,
+  color = "green", 
 }: ButtonProps) => {
   const scale = new Animated.Value(1);
   const opacity = new Animated.Value(1); 
@@ -73,7 +75,7 @@ const Button = ({
     opacity, 
   };
 
-  const containerStyle = {
+  const containerStyle: ViewStyle = {
     alignSelf: full ? "stretch" : "center",
     backgroundColor: variant === "fill"
       ? disabled
@@ -98,7 +100,7 @@ const Button = ({
       onPress={(event) => !disabled && onPress?.(event)}
       onPressIn={() => !disabled && handlePressIn()}
       onPressOut={() => !disabled && handlePressOut()}
-      style={[containerStyle, getButtonStyle(size)]}
+      style={[containerStyle, getButtonStyle(size), style]}
     >
       <Animated.View style={animatedStyle}>
         <Typography variant={getButtonFont(size)} color={textColor}>
