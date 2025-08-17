@@ -42,6 +42,6 @@ export default GroupFlatList;
 
 const styles = StyleSheet.create({
   list: {
-    gap: 16,
+    gap: 8,
   },
 });

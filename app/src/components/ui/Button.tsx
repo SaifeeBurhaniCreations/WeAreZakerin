@@ -7,6 +7,7 @@ import { ViewStyle } from '@expo/html-elements/build/primitives/View';
 
 const getButtonFont = (size: string) => {
   switch (size) {
+    case "xs": return "b5";
     case "sm": return "b4";
     case "md": return "b3";
     case "lg": return "b2";
@@ -17,6 +18,7 @@ const getButtonFont = (size: string) => {
 
 const getButtonStyle = (size: string) => {
   switch (size) {
+    case "xs": return styles.xs;
     case "sm": return styles.sm;
     case "md": return styles.md;
     case "lg": return styles.lg;
@@ -114,6 +116,10 @@ const Button = ({
 export default Button;
 
 const styles = StyleSheet.create({
+  xs: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
   sm: {
     paddingVertical: 6,
     paddingHorizontal: 12,

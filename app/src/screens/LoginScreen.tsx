@@ -59,57 +59,61 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.pageContainer}>
-   <View style={styles.hexagonBackground}>
+      <View style={styles.hexagonBackground}>
         {Array.from({ length: 18 }, (_, index) => renderHexagonRow(index, SCREEN_WIDTH, getColor("green", 500, 0.5)))}
       </View>
 
       <View style={styles.loginContainer}>
-      <Logo />
+        <Logo />
 
         <Typography variant='h2' color={getColor("green", 700)}>Login to your account</Typography>
 
         <View style={styles.loginInputContainer}>
-        <Controller
-                        control={control}
-                        name="userid"
-                        render={({ field: { onChange, onBlur, value } }) => (
-                          <Input
-                            placeholder="Enter ITS number"
-                            value={value}
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            error={errors.userid?.message}
-                            keyboardType="phone-pad"
-                            maxLength={8}
-                          >
-                            ITS number
-                          </Input>
-                        )}
-                      />
-        <Controller
-                        control={control}
-                        name="userpass"
-                        render={({ field: { onChange, onBlur, value } }) => (
-                          <Input
-                            placeholder="Enter Password"
-                            value={value}
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            error={errors.userpass?.message}
-                            secureTextEntry={true}
-                            icon={showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                            post
-                            onIconPress={() => setShowPassword(!showPassword)}>
-                            Password
-                          </Input>
-                        )}
-                      />
-                          
+          <Controller
+            control={control}
+            name="userid"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                style={{ width: "100%" }}
+                placeholder="Enter ITS number"
+                size='lg'
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={errors.userid?.message}
+                keyboardType="phone-pad"
+                maxLength={8}
+              >
+                ITS number
+              </Input>
+            )}
+          />
+          <Controller
+            control={control}
+            name="userpass"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                placeholder="Enter Password"
+                value={value}
+                style={{ width: "100%" }}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                size='lg'
+                error={errors.userpass?.message}
+                secureTextEntry={true}
+                icon={showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                post
+                onIconPress={() => setShowPassword(!showPassword)}>
+                Password
+              </Input>
+            )}
+          />
 
-<Button disabled={!isValid || loading} full onPress={handleSubmit(onSubmit)}>
-  {loading ? 'Logging in...' : 'Login'}
-</Button>
-      </View>
+
+          <Button disabled={!isValid || loading} full onPress={handleSubmit(onSubmit)}>
+            {loading ? 'Logging in...' : 'Login'}
+          </Button>
+        </View>
       </View>
     </View>
   )
@@ -126,7 +130,7 @@ const styles = StyleSheet.create({
     padding: 24
   },
   hexagonBackground: {
-    ...StyleSheet.absoluteFillObject, 
+    ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
   },

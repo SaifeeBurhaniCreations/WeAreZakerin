@@ -14,6 +14,7 @@ import { createGroup } from "@/src/service/GroupService";
 import Button from "./Button";
 import { handleAddUser } from "@/src/redux/slices/UserSlice";
 import { Toast } from "@/src/utils/Toast";
+import { capitalizeFirstLetter, normalizeString } from "@/src/utils/common";
 
 const AddPartyModal = () => {
     const dispatch = useDispatch();
@@ -50,18 +51,18 @@ const AddPartyModal = () => {
 
         if (data.selectedValue === "add_admin") {
             payload = {
-                name: data.name,
+                name: normalizeString(data.name),
                 userDetails: {
                     userid: Number(data.userid),
-                    fullname: data.fullname,
+                    fullname: normalizeString(data.fullname!),
                     phone: Number(data.phone),
-                    address: data.address,
+                    address: normalizeString(data.address!),
                 }
             };
         } else {
             payload = {
                 adminId: data.selectedValue,
-                name: data.name
+                name: normalizeString(data.name)
             };
         }
 
@@ -110,7 +111,7 @@ const AddPartyModal = () => {
                 render={({ field: { onChange, onBlur, value } }) => (
                     <Input
                         placeholder="Party Name"
-                        value={value}
+                        value={capitalizeFirstLetter(value)}
                         onChangeText={onChange}
                         onBlur={onBlur}
                         error={errors.name?.message}
@@ -146,7 +147,7 @@ const AddPartyModal = () => {
                         render={({ field: { onChange, onBlur, value } }) => (
                             <Input
                                 placeholder="Full Name"
-                                value={value}
+                                value={capitalizeFirstLetter(value!)}
                                 onChangeText={onChange}
                                 onBlur={onBlur}
                                 error={errors.fullname?.message}
@@ -189,7 +190,7 @@ const AddPartyModal = () => {
                         render={({ field: { onChange, onBlur, value } }) => (
                             <Input
                                 placeholder="Address"
-                                value={value}
+                                value={capitalizeFirstLetter(value!)}
                                 onChangeText={onChange}
                                 onBlur={onBlur}
                                 error={errors.address?.message}

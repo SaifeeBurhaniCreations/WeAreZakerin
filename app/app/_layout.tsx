@@ -6,7 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Platform, View, StatusBar as RNStatusBar } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { getColor } from "@/src/constants/colors";
-import { AntiAuthGuard, AuthGuard } from "@/src/components/layouts/Guard";
+// import { AntiAuthGuard, AuthGuard } from "@/src/components/layouts/Guard";
 import 'react-native-gesture-handler';
 import { Provider } from "react-redux";
 import { store } from "@/src/redux/store";
@@ -20,11 +20,20 @@ import EditProfileScreen from '@/src/screens/EditProfileScreen';
 import ScheduleEventScreen from '@/src/screens/ScheduleEventScreen';
 import PianoScreen from "@/src/screens/PianoScreen";
 import { ToastRoot } from "@/src/utils/Toast";
+import OccassionListScreen from "@/src/screens/Occassion/OccassionListScreen";
+import OccassionDetailScreen from "@/src/screens/Occassion/OccassionDetailScreen";
+import ManageOccassionScreen from "@/src/screens/Occassion/ManageOccassionScreen";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AntiAuthGuard } from "@/src/components/layouts/Guard";
+import AuthGuard from "@/src/components/layouts/Guard";
+import OccassionAttendanceScreen from "@/src/screens/Occassion/OccassionAttendanceScreen";
 
 const Stack = createStackNavigator();
 
 export default function RootLayout() {
   const [isAppReady, setIsAppReady] = useState(false);
+
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     async function loadResources() {
@@ -56,81 +65,114 @@ export default function RootLayout() {
   
   return (
     <Provider store={store}>
-    <ToastRoot />
-    <GluestackUIProvider mode="light">
-      <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
-        <StatusBar backgroundColor={getColor("green")} style="light" />
-        <Suspense fallback={<LoaderScreen />}>
-          <Stack.Navigator initialRouteName="Landing">
-            <Stack.Screen name="Home" options={{ headerShown: false }}>
-              {() => (
-                <AuthGuard>
-                  <HomeScreen />
-                </AuthGuard>
-              )}
-            </Stack.Screen>
-            <Stack.Screen name="Users" options={{ headerShown: false }}>
-              {() => (
-                <AuthGuard>
-                  <UsersScreen />
-                </AuthGuard>
-              )}
-            </Stack.Screen>
-            <Stack.Screen name="Profile" options={{ headerShown: false }}>
-              {() => (
-                <AuthGuard>
-                  <ProfileScreen />
-                </AuthGuard>
-              )}
-            </Stack.Screen>
-            <Stack.Screen name="EditProfile" options={{ headerShown: false }}>
-              {() => (
-                <AuthGuard>
-                  <EditProfileScreen />
-                </AuthGuard>
-              )}
-            </Stack.Screen>
-            <Stack.Screen name="ScheduleEvent" options={{ headerShown: false }}>
-              {() => (
-                <AuthGuard>
-                  <ScheduleEventScreen />
-                </AuthGuard>
-              )}
-            </Stack.Screen>
-            <Stack.Screen name="Piano" options={{ headerShown: false }}>
-              {() => (
-                <AuthGuard>
-                  <PianoScreen />
-                </AuthGuard>
-              )}
-            </Stack.Screen>
+      <QueryClientProvider client={queryClient}>
+        <ToastRoot />
+        <GluestackUIProvider mode="light">
+          <View style={{ flex: 1, paddingTop: Platform.OS === "android" ? RNStatusBar.currentHeight : 0 }}>
+            <StatusBar backgroundColor={getColor("green")} style="light" />
+            <Suspense fallback={<LoaderScreen />}>
+              <Stack.Navigator initialRouteName="Landing">
+                <Stack.Screen name="Home" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <HomeScreen />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="Users" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <UsersScreen />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="OccasionList" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <OccassionListScreen />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="OccasionDetail" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <OccassionDetailScreen
+                    />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="OccasionAttendance" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <OccassionAttendanceScreen
+                    />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="ManageOccasion" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <ManageOccassionScreen
+                    />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="Profile" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <ProfileScreen />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="EditProfile" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <EditProfileScreen />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="ScheduleEvent" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <ScheduleEventScreen />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="Piano" options={{ headerShown: false }}>
+                  {() => (
+                    <AuthGuard>
+                      <PianoScreen />
+                    </AuthGuard>
+                  )}
+                </Stack.Screen>
 
-            <Stack.Screen name="Login" options={{ headerShown: false }}>
-              {() => (
-                <AntiAuthGuard>
-                  <LoginScreen />
-                </AntiAuthGuard>
-              )}
-            </Stack.Screen>
+                <Stack.Screen name="Login" options={{ headerShown: false }}>
+                  {() => (
+                    <AntiAuthGuard>
+                      <LoginScreen />
+                    </AntiAuthGuard>
+                  )}
+                </Stack.Screen>
 
-            <Stack.Screen name="Landing" options={{ headerShown: false }}>
-              {() => (
-                <AntiAuthGuard>
-                  <LandingScreen />
-                </AntiAuthGuard>
-              )}
-            </Stack.Screen>
-            <Stack.Screen name="Loader" options={{ headerShown: false }}>
-              {() => (
-                <AntiAuthGuard>
-                  <LoaderScreen />
-                </AntiAuthGuard>
-              )}
-            </Stack.Screen>
-          </Stack.Navigator>
-        </Suspense>
-      </View>
-    </GluestackUIProvider>
+                <Stack.Screen name="Landing" options={{ headerShown: false }}>
+                  {() => (
+                    <AntiAuthGuard>
+                      <LandingScreen />
+                    </AntiAuthGuard>
+                  )}
+                </Stack.Screen>
+                <Stack.Screen name="Loader" options={{ headerShown: false }}>
+                  {() => (
+                    <AntiAuthGuard>
+                      <LoaderScreen />
+                    </AntiAuthGuard>
+                  )}
+                </Stack.Screen>
+              </Stack.Navigator>
+            </Suspense>
+          </View>
+        </GluestackUIProvider>
+      </QueryClientProvider>
     </Provider>
 
   );

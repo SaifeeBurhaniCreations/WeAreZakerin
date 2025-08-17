@@ -1,20 +1,20 @@
+import { Event, RootStackParamList } from "@/src/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Types
-export interface EventItem {
-    type: string;
-    name: string;
-    party: string;
-    rating: number;
-}
-
 export interface PartyItem {
     name: string;
     count: number;
 }
+export interface HijriDate {
+    month: number;
+    day: number;
+    year: number;
+}
 
 export interface Occassion {
     _id?: string; // MongoDB ID
+    id?: string; // MongoDB ID
     createdat: Date;
     updatedat: Date;
     location: string;
@@ -22,10 +22,15 @@ export interface Occassion {
     time: Date;
     ends_at: Date;
     name: string;
+    description: string;
     status: string;
+    pressable?: boolean;
     created_by: string;
-    events: EventItem[];
+    hijri_date: HijriDate;
+    events: Event[];
+    attendees: string[];
     parties: PartyItem[];
+    onPress?: keyof RootStackParamList
 }
 
 interface OccassionState {
@@ -40,7 +45,7 @@ const OccassionSlice = createSlice({
     reducers: {
         // Set full list (e.g., after fetchAll)
         setOccassions: (state, action: PayloadAction<Occassion[]>) => {
-            state = action.payload;
+            return action.payload;
         },
 
         // Add new occasion to state (e.g., after create API success)
@@ -48,13 +53,15 @@ const OccassionSlice = createSlice({
             state.push(action.payload);
         },
 
-        // Update occasion by id (e.g., after update API success)
         updateOccassion: (state, action: PayloadAction<Occassion>) => {
-            state = state.map((occ) =>
-                occ._id === action.payload._id ? action.payload : occ
-            );
+            console.log(action.payload);
+            console.log(state);
+            const index = state.findIndex(occ => occ._id === action.payload._id);
+            if (index !== -1) {
+                state[index] = action.payload;
+            }
         },
-
+        
         // Remove occasion by id (e.g., after delete API success)
         removeOccassion: (state, action: PayloadAction<string>) => {
             state = state.filter((occ) => occ._id !== action.payload);
@@ -64,6 +71,10 @@ const OccassionSlice = createSlice({
         setOccassionGroups: (state, action: PayloadAction<any[]>) => {
             // You can store grouped data differently if needed
             state = action.payload as any;
+        },
+
+        clearOccassions: (state) => {
+            return []
         }
     }
 });
@@ -73,7 +84,8 @@ export const {
     addOccassion,
     updateOccassion,
     removeOccassion,
-    setOccassionGroups
+    setOccassionGroups,
+    clearOccassions
 } = OccassionSlice.actions;
 
 export default OccassionSlice.reducer;

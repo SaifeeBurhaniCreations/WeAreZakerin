@@ -23,7 +23,7 @@ const HomeScreen = () => {
     <View style={styles.pageContainer}>
         <View style={[styles.Hstack, styles.justifyBetween]}>
           <Typography variant='h3'>Parties</Typography>
-          <Button size="sm" variant='outline' onPress={() => goTo("ScheduleEvent")}>Schedule Event</Button>
+          <Button size="sm" variant='outline' onPress={() => goTo("OccasionList")}>List Miqats</Button>
     </View>
 
         <View style={styles.Hstack}>
