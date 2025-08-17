@@ -14,6 +14,7 @@ import BottomSheetModal from './modals/BottomSheetModal';
 import Select from './Select';
 import Input from './Input';
 import Switch from './Switch';
+import { normalizeString } from '@/src/utils/common';
 
 interface AddMemberModalProps {
     name: string;
@@ -66,9 +67,9 @@ const AddMemberModal = React.forwardRef<AddDataModalRef, AddMemberModalProps>(({
                     });
                     const userPayload = users?.find(user => user._id === data.selectedValue);
                     if (userPayload) {
-                        dispatch(handleAddMemberInGroup({ name, user: userPayload }));
+                        dispatch(handleAddMemberInGroup({ name: normalizeString(name), user: userPayload }));
                     }
-                    dispatch(handleAddUserInParty({ name: name!, user: data.selectedValue! }));
+                    dispatch(handleAddUserInParty({ name: normalizeString(name)!, user: data.selectedValue! }));
                     modalRef.current?.close();
                     resetAddMember();
                 }
@@ -83,7 +84,7 @@ const AddMemberModal = React.forwardRef<AddDataModalRef, AddMemberModalProps>(({
                         variant: 'success',
                     });
                     dispatch(handleAddUser(newUser));
-                    dispatch(handleAddMemberInGroup({ name, user: newUser }));
+                    dispatch(handleAddMemberInGroup({ name: normalizeString(name), user: newUser }));
                     modalRef.current?.close();
                     resetAddMember();
                 }
@@ -113,7 +114,7 @@ const AddMemberModal = React.forwardRef<AddDataModalRef, AddMemberModalProps>(({
             ref={modalRef}
             footer={loading ? 'Adding...' : 'Add'}
             onPress={handleAddMemberSubmit(handleAddMember)}
-            footerButtonProps={{ disabled: loading }}
+            // footerButtonProps={{ disabled: loading }}
         >
             <Controller
                 control={control}

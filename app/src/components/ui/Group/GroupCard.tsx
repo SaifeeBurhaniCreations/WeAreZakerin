@@ -1,6 +1,6 @@
 import { getColor } from '@/src/constants/colors';
 import { GroupCardProps } from '@/src/types';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Typography from '../../typography/Typography';
 import Tag from '../Tag';
 import React, { memo } from 'react';
@@ -49,15 +49,12 @@ const GroupCard = ({ id, name, admin, members = [], pressable, onPress }: Group)
   );
 
   return pressable ? (
-    <Pressable
-      style={({ pressed }) => [
-        styles.card,
-        pressed && { transform: [{ scale: 0.97 }], opacity: 0.9 },
-      ]}
+    <TouchableOpacity
+      style={styles.card}
       onPress={() => handlePress()}
     >
       <CardContent />
-    </Pressable>
+    </TouchableOpacity>
   ) : (
     <View style={styles.card}>
       <CardContent />
@@ -71,15 +68,15 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: getColor('light'),
     paddingHorizontal: 12,
-    paddingVertical: 16,
-    borderRadius: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
     gap: 8,
     flexDirection: 'column',
-    shadowColor: 'rgba(0, 17, 13, 0.06)',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowColor: getColor("dark", 400), 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3, 
+    elevation: 2,
   },
   cardTitleContainer: {
     flexDirection: 'row',

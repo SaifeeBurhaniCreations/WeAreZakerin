@@ -121,6 +121,10 @@ const UsersScreen = () => {
         }
     };
 
+    useEffect(() => {
+        transferAdminId === 'add_member' && addMemberRef.current?.open();
+    }, [transferAdminId])
+
     if (!groupId) {
         Toast.show({ title: 'Error', description: 'Group ID is missing', variant: 'error' });
         return;
@@ -229,9 +233,9 @@ const UsersScreen = () => {
                 onPress={handleTransferAdmin}
             >
                 <Select
-                    options={allMembers
+                    options={[...allMembers
                         .filter((user: any) => user?._id !== admin)
-                        .map((user: any) => ({ label: user?.fullname, value: user?._id }))}
+                        .map((user: any) => ({ label: user?.fullname, value: user?._id })), { label: 'Add Member', value: 'add_member' }]}
                     value={transferAdminId ?? undefined}
                     onSelect={setTransferAdminId}
                     placeholder="Choose Admin"

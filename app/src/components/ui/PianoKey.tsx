@@ -15,10 +15,12 @@ const semitoneOffsets: Record<string, number> = {
   'F#': 6, 'Gb': 6,
   'G': 7,
   'G#': 8, 'Ab': 8,
-  'A': 4,
+  'A': 9,
   'A#': 10, 'Bb': 10,
   'B': 11,
 };
+
+
 
 const PianoKey = ({
   type,
@@ -39,27 +41,41 @@ const PianoKey = ({
 }) => {
 
   const soundRef = useRef<Audio.Sound | null>(null);
+  function getNoteOffset(note: string) {
+    const match = /^([A-G]#?|Bb|Db|Gb|Ab|Eb)(\d)$/.exec(note);
+    if (!match) return undefined;
+    const [, baseNote, octaveStr] = match;
+    const octave = parseInt(octaveStr, 10);
+    const baseOffset = semitoneOffsets[baseNote];
+    if (baseOffset === undefined) return undefined;
+    // C3 is your sample, so offset from C3
+    return (octave - 3) * 12 + baseOffset;
+  }
+  
 
   const playNote = async () => {
-    const offset = semitoneOffsets[note];
+    const offset = getNoteOffset(note); // note = "D#3", for example
     if (offset === undefined) return;
-
+  
     const { sound } = await Audio.Sound.createAsync(
       require('@/src/assets/notes/harmonium.wav'),
       { shouldPlay: true }
     );
-
+  
     soundRef.current = sound;
-
+    
+    
     try {
-      const rate = Math.pow(2, offset / 12); // pitch shift
+      const rate = Math.pow(2, offset / 12);
       await sound.setRateAsync(rate, true);
+      // console.log(rate);
       await sound.playAsync();
     } catch (error) {
       console.error("Playback error:", error);
       await sound.unloadAsync();
     }
   };
+  
 
   const stopNote = async () => {
     if (soundRef.current) {
@@ -118,14 +134,14 @@ const styles = StyleSheet.create({
   },
   whiteKey: {
     flex: 1,
-    height: screenHeight * 0.42,
+    height: screenHeight * 0.38,
     backgroundColor: getColor('light', 500),
     zIndex: 1,
     borderRadius: 8,
   },
   blackKey: {
     width: 32,
-    height: screenHeight * 0.22,
+    height: screenHeight * 0.2,
     backgroundColor: getColor("dark"),
     position: 'absolute',
     top: 0,

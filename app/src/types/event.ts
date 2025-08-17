@@ -1,5 +1,6 @@
 export interface miqaatProps {
     title: string;
+    location?: string;
     description: string | null;
     phase: "night" | "day";
     priority: number;

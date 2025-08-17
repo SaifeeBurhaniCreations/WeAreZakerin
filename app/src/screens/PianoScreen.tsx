@@ -6,7 +6,7 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import Metronome from '../components/ui/Mentronome';
 import { Audio } from 'expo-av';
 
-const whiteNotes = ["A", "B", 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
+const whiteNotes = ["A", "B", 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I', 'J', 'K', 'L', 'M', 'N'];
 const blackNotes = ["A#", "B#", 'C#', 'D#', 'F#', 'G#', 'H#', 'I#', 'J#', 'K#', 'L#', 'M#', 'N#'];
 
 const noteSoundFiles: Record<string, any> = {

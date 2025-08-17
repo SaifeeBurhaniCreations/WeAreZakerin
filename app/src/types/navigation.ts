@@ -1,4 +1,5 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Occassion } from "../redux/slices/OccassionSlice";
 
 export type RootStackParamList = {
     Home: undefined;
@@ -9,6 +10,10 @@ export type RootStackParamList = {
     Profile?: { id: string } | undefined;
     EditProfile: undefined;
     ScheduleEvent: undefined;
+    OccasionList: undefined;
+    OccasionDetail: {data: Occassion};
+    ManageOccasion: {data: Occassion};
+    OccasionAttendance: {data: Occassion};
     Piano: undefined;
 };
 

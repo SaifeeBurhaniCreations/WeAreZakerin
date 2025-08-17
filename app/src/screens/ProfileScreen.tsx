@@ -18,8 +18,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
 import { useEffect, useRef, useState } from 'react';
 import { removeUser } from '../service/UserService';
-import { handleFetchUser } from '../redux/slices/UserSlice';
-import { handleFetchGroup } from '../redux/slices/AddPartySlice';
+import { clearUsers, handleFetchUser } from '../redux/slices/UserSlice';
+import { clearGroups, handleFetchGroup } from '../redux/slices/AddPartySlice';
 import { Toast } from '../utils/Toast';
 import Select from '../components/ui/Select';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -27,6 +27,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChooseAdminFormData, chooseAdminSchema } from '../schemas/UserSchema';
 import BottomSheetModal from '../components/ui/modals/BottomSheetModal';
 import AddMemberModal from '../components/ui/AddMemberModal';
+import { clearOccassions } from '../redux/slices/OccassionSlice';
 
 
 type ProfileRouteProp = RouteProp<RootStackParamList, 'Profile'>;
@@ -101,10 +102,12 @@ const ProfileScreen = () => {
     },
   });
 
-
   const handleLogout = async() => {
     await removeMetaData();
     resetTo("Landing");
+    dispatch(clearGroups())
+    dispatch(clearUsers())
+    dispatch(clearOccassions())
   }
 
   const onSubmit: SubmitHandler<ChooseAdminFormData> = async (data) => {

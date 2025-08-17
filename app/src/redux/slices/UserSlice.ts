@@ -77,7 +77,11 @@ export type User = {
         state.users = state.users.map(value =>
           value._id === user ? { ...value, belongsto: '' } : value
         );
-      } 
+      },
+      clearUsers: (state) => {
+        state.me = {}
+        state.users = []
+      }
     },
   });
   
@@ -89,6 +93,7 @@ export type User = {
     handleUpdateUserRole,
     handleRemoveUserFromParty,
     handleRemoveUser,
+    clearUsers
   } = UserSlice.actions;
   
   export default UserSlice.reducer;

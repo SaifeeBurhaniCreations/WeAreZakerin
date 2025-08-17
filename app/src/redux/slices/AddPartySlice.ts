@@ -90,11 +90,14 @@ const AddPartySlice = createSlice({
           (memberIdInGroup) => memberIdInGroup !== memberId
         );
       }
+    },
+    clearGroups: (state) => {
+      state.groups = []
     }
 
   },
 });
 
-export const { toggleModal, handleFetchGroup, handleAddGroup, handleUpdateGroup, handleDeleteGroup, handleAddMemberInGroup, handleRemoveMemberFromGroup } =
+export const { toggleModal, clearGroups, handleFetchGroup, handleAddGroup, handleUpdateGroup, handleDeleteGroup, handleAddMemberInGroup, handleRemoveMemberFromGroup } =
   AddPartySlice.actions;
 export default AddPartySlice.reducer;

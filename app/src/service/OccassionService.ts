@@ -10,7 +10,7 @@ export const createOccasion = async (formData: any) => {
 // UPDATE Occasion
 export const updateOccasion = async (id: string, updatedData: any) => {
     const headers = await useAuthHeader();
-    return api.put(`/occassion/update/${id}`, updatedData, { headers });
+    return api.patch(`/occassion/update/${id}`, updatedData, { headers });
 };
 
 // DELETE Occasion
@@ -24,8 +24,9 @@ export const fetchAllOccasions = async () => {
     return api.get("/occassion/fetch/all");
 };
 
-export const fetchOccasionPending = async (status: string) => {
-    return api.get(`/occassion/fetch/status/${status}`);
+export const fetchOccasionPending = async (status: string | string[]) => {
+    const statusParam = Array.isArray(status) ? status.join(',') : status;
+    return api.get(`/occassion/fetch/status?status=${statusParam}`);
 };
 
 export const fetchOccasionById = async (id: string) => {
