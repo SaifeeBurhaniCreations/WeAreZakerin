@@ -16,14 +16,11 @@ import EyeOffIcon from '../components/icons/EyeOffIcon'
 import EyeIcon from '../components/icons/EyeIcon'
 import { LoginService } from '../service/AuthService'
 import useAppNavigation from '../hooks/useAppNavigation'
+import { Toast } from '../utils/Toast'
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
-
-const loginDB = [
-{userid: "10203040", name: "Aliasger Baroor",  }
-]
 
 const LoginScreen = () => {
   const { goTo } = useAppNavigation();
@@ -44,6 +41,11 @@ const LoginScreen = () => {
       setLoading(true);
       const response = await LoginService(data);
       if (response.status === 200) {
+        Toast.show({
+          title: 'Login',
+          description: 'Welcome Back!',
+          variant: 'success',
+        });
         const token = response.data.token;
         await SecureStore.setItemAsync('metadata', token);
         goTo('Home');

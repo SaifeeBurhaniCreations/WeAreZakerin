@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = "https://5a24524ad8a3.ngrok-free.app/api/v1";
+const API_URL = "https://db86bbb2f733.ngrok-free.app/api/v1";
 
 const api = axios.create({
   baseURL: API_URL,

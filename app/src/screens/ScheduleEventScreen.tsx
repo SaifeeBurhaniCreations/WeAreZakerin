@@ -1,15 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { getColor } from "../constants/colors";
 import Typography from "../components/typography/Typography";
 import BackIcon from "../components/icons/BackIcon";
 import BottomSheetModal from "../components/ui/modals/BottomSheetModal";
+import { format } from 'date-fns';
 import { AddDataModalRef, eventProps, miqaatProps } from "../types";
 import CircleIcon from "../components/icons/CircleIcon";
 import { initialIslamicEvents } from "../constants/event";
@@ -18,31 +21,94 @@ import Select from "../components/ui/Select";
 import Switch from "../components/ui/Switch";
 import { normalizeEvents } from "../utils/eventUtils";
 import Overlay from "../components/ui/Overlay";
-import { daysOfWeek, getGregorianDateFromIslamic, getIslamicDate, getIslamicMonthLengths, islamicMonths, months, toArabicNumerals } from "../utils/calanderUtils";
+import {
+  daysOfWeek,
+  getGregorianDateFromIslamic,
+  getIslamicDate,
+  getIslamicMonthLengths,
+  islamicMonths,
+  months,
+  toArabicNumerals
+} from "../utils/calanderUtils";
 import dayjs from "dayjs";
 import TimePicker from "../components/ui/TimePicker";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import CrossIcon from "../components/icons/CrossIcon";
+import Button from "../components/ui/Button";
+import { useCreateOccasion } from "../hooks/useOccassion";
+import { renameKey } from "../hooks/renameKey";
+import { Toast } from "../utils/Toast";
 
+// Types
+interface Assignment {
+  name: string;
+  party: string;
+}
 
-const Calendar = () => {
+interface CreateEventData {
+  month: number;
+  date: number;
+  miqaat: miqaatProps;
+}
+
+interface ValidationErrors {
+  eventName?: string;
+  eventDescription?: string;
+  eventLocation?: string;
+  selectedParty?: string;
+  date?: string;
+  selectedStartTime?: string;
+  assignments?: string;
+}
+
+interface KalamOption {
+  label: string;
+  value: string;
+}
+
+// Constants
+const KALAM_OPTIONS: KalamOption[] = [
+  { label: "Salam", value: "salam" },
+  { label: "Noha", value: "noha" },
+  { label: "Madeh", value: "madeh" },
+  { label: "Nasihat", value: "nasihat" },
+  { label: "Rasa", value: "rasa" },
+  { label: "Na'at", value: "na'at" },
+  { label: "Ilteja", value: "ilteja" },
+];
+
+const INITIAL_ASSIGNMENT: Assignment = { name: "", party: "" };
+
+const Calendar: React.FC = () => {
+// Refs
   const modalRef = useRef<AddDataModalRef>(null);
   const AssignPartyRef = useRef<AddDataModalRef>(null);
   const createEventModalRef = useRef<AddDataModalRef>(null);
-  const today = new Date();
-  const todayIslamic = getIslamicDate(today)!;
 
-  const [currentIslamicYear, setCurrentIslamicYear] = useState(todayIslamic.year);
-  const [currentIslamicMonthIndex, setCurrentIslamicMonthIndex] = useState(todayIslamic.monthIndex);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(currentIslamicYear);
-  const [selectedMonthIndex, setSelectedMonthIndex] = useState(currentIslamicMonthIndex);
-  const [selectedDay, setSelectedDay] = useState(1);
-  const [selectedDateString, setSelectedDateString] = useState("");
-  const [selectedEvents, setSelectedEvents] = useState<any[]>([]);
-  const [createEventData, setCreateEventData] = useState<{
-    month: number;
-    date: number;
-    miqaat: miqaatProps;
-  }>({
+  // Hooks
+  const { create, isError, isLoading, isSuccess } = useCreateOccasion();
+  const { groups } = useSelector((state: RootState) => state.party);
+  const { me } = useSelector((state: RootState) => state.users);
+
+  // State initialization with proper types
+  const today = useMemo(() => new Date(), []);
+  const todayIslamic = useMemo(() => getIslamicDate(today)!, [today]);
+
+  const [currentIslamicYear, setCurrentIslamicYear] = useState<number>(todayIslamic.year);
+  const [currentIslamicMonthIndex, setCurrentIslamicMonthIndex] = useState<number>(todayIslamic.monthIndex);
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [showStartPicker, setShowStartPicker] = useState<boolean>(false);
+  const [selectedYear, setSelectedYear] = useState<number>(currentIslamicYear);
+  const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(currentIslamicMonthIndex);
+  const [selectedDay, setSelectedDay] = useState<number>(1);
+  const [selectedDateString, setSelectedDateString] = useState<string>("");
+  const [selectedEvents, setSelectedEvents] = useState<miqaatProps[]>([]);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Form state
+  const [createEventData, setCreateEventData] = useState<CreateEventData>({
     month: 0,
     date: 0,
     miqaat: {
@@ -57,94 +123,176 @@ const Calendar = () => {
   const [islamicEvents, setIslamicEvents] = useState<eventProps[]>(() =>
     normalizeEvents(initialIslamicEvents)
   );
-  const [eventName, setEventName] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
-  const [eventLocation, setEventLocation] = useState("");
-  const [eventSwitchValue, setEventSwitchValue] = useState(false);
+
+  const [eventName, setEventName] = useState<string>("");
+  const [eventDescription, setEventDescription] = useState<string>("");
+  const [eventLocation, setEventLocation] = useState<string>("");
+  const [eventSwitchValue, setEventSwitchValue] = useState<boolean>(false);
   const [selectedParty, setSelectedParty] = useState<string>("");
-
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [date, setDate] = useState<string>("");
   const [selectedStartTime, setSelectedStartTime] = useState<Date | null>(null);
-  const [selectedEndTime, setSelectedEndTime] = useState<Date | null>(null);
+  const [assignments, setAssignments] = useState<Assignment[]>([{ ...INITIAL_ASSIGNMENT }]);
 
+  // Validation functions
+  const validateEventForm = useCallback((): ValidationErrors => {
+    const errors: ValidationErrors = {};
 
-  const monthLengths = getIslamicMonthLengths(currentIslamicYear);
-  const totalDays = monthLengths[currentIslamicMonthIndex];
-  const startDate = getGregorianDateFromIslamic(currentIslamicYear, currentIslamicMonthIndex, 1);
-  const startDay = startDate.getDay();
+    if (!eventName.trim()) {
+      errors.eventName = "Event name is required";
+    } else if (eventName.trim().length < 3) {
+      errors.eventName = "Event name must be at least 3 characters";
+    }
 
-  const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + totalDays - 1);
+    if (!eventDescription.trim()) {
+      errors.eventDescription = "Event description is required";
+    } else if (eventDescription.trim().length < 10) {
+      errors.eventDescription = "Event description must be at least 10 characters";
+    }
+
+    if (!eventLocation.trim()) {
+      errors.eventLocation = "Event location is required";
+    }
+
+    if (!date) {
+      errors.date = "Event date is required";
+    }
+
+    if (!selectedStartTime) {
+      errors.selectedStartTime = "Event start time is required";
+    }
+
+    // Validate assignments
+    const hasEmptyAssignments = assignments.some(assignment =>
+      !assignment.name.trim() || !assignment.party.trim()
+    );
+
+    if (hasEmptyAssignments) {
+      errors.assignments = "All assignment fields must be filled";
+    }
+
+    // Check for duplicate assignments
+    const assignmentKeys = assignments.map(a => `${a.name}-${a.party}`);
+    const uniqueAssignments = new Set(assignmentKeys);
+    if (assignmentKeys.length !== uniqueAssignments.size) {
+      errors.assignments = "Duplicate assignments are not allowed";
+    }
+
+    return errors;
+  }, [eventName, eventDescription, eventLocation, date, selectedStartTime, assignments]);
+
+  const validateAssignPartyForm = useCallback((): ValidationErrors => {
+    const errors: ValidationErrors = {};
+
+    const eventNameToUse = eventName || selectedEvents[0]?.title;
+    if (!eventNameToUse?.trim()) {
+      errors.eventName = "Event name is required";
+    }
+
+    if (!eventLocation.trim()) {
+      errors.eventLocation = "Event location is required";
+    }
+
+    if (!date) {
+      errors.date = "Event date is required";
+    }
+
+    if (!selectedStartTime) {
+      errors.selectedStartTime = "Event start time is required";
+    }
+
+    const hasEmptyAssignments = assignments.some(assignment =>
+      !assignment.name.trim() || !assignment.party.trim()
+    );
+
+    if (hasEmptyAssignments) {
+      errors.assignments = "All assignment fields must be filled";
+    }
+
+    return errors;
+  }, [eventName, selectedEvents, eventLocation, date, selectedStartTime, assignments]);
+
+  // Clear validation errors when fields change
+  useEffect(() => {
+    setValidationErrors(prev => ({ ...prev, eventName: undefined }));
+  }, [eventName]);
 
   useEffect(() => {
-    setCreateEventData((prevData) => ({
-      ...prevData,
-      month: selectedMonthIndex,
-      date: selectedDay,
-    }));
-  }, [selectedDay, selectedMonthIndex]);
+    setValidationErrors(prev => ({ ...prev, eventDescription: undefined }));
+  }, [eventDescription]);
 
-  const getEventsForDate = (monthIndex: number, day: number) => {
-    return islamicEvents.find(event => event.month === monthIndex && event.date === day)?.miqaats || [];
-  };
+  useEffect(() => {
+    setValidationErrors(prev => ({ ...prev, eventLocation: undefined }));
+  }, [eventLocation]);
 
-  const changeIslamicMonth = (offset: number) => {
-    setCurrentIslamicMonthIndex((prev) => {
-      const newIndex = prev + offset;
-      if (newIndex < 0) {
-        setCurrentIslamicYear((prevYear) => prevYear - 1);
-        return 11;
-      } else if (newIndex > 11) {
-        setCurrentIslamicYear((prevYear) => prevYear + 1);
-        return 0;
-      }
-      return newIndex;
-    });
-  };
+  useEffect(() => {
+    setValidationErrors(prev => ({ ...prev, date: undefined }));
+  }, [date]);
 
-  const goToToday = () => {
-    const todayIslamic = getIslamicDate(new Date())!;
-    setCurrentIslamicYear(todayIslamic.year);
-    setCurrentIslamicMonthIndex(todayIslamic.monthIndex);
-  };
+  useEffect(() => {
+    setValidationErrors(prev => ({ ...prev, selectedStartTime: undefined }));
+  }, [selectedStartTime]);
 
-  const createEvent = () => {
-    setIslamicEvents((prevEvents) => {
-      const newEvent = {
-        month: createEventData.month,
-        date: createEventData.date,
-        miqaats: [
-          {
-            title: eventName,
-            description: eventDescription,
-            location: eventLocation,
-            priority: 2,
-            phase: eventSwitchValue ? "day" : "night" as "day" | "night",
-            year: null,
-          },
-        ],
-      };
+  useEffect(() => {
+    setValidationErrors(prev => ({ ...prev, assignments: undefined }));
+  }, [assignments]);
 
-      const existingIndex = prevEvents.findIndex(
-        (e) => e.month === newEvent.month && e.date === newEvent.date
-      );
+  // Computed values with memoization
+  const monthLengths = useMemo(() => getIslamicMonthLengths(currentIslamicYear), [currentIslamicYear]);
+  const totalDays = useMemo(() => monthLengths[currentIslamicMonthIndex], [monthLengths, currentIslamicMonthIndex]);
+  const startDate = useMemo(() => getGregorianDateFromIslamic(currentIslamicYear, currentIslamicMonthIndex, 1), [currentIslamicYear, currentIslamicMonthIndex]);
+  const startDay = useMemo(() => startDate.getDay(), [startDate]);
 
-      if (existingIndex !== -1) {
-        const updatedEvents = [...prevEvents];
-        updatedEvents[existingIndex].miqaats.push(newEvent.miqaats[0]);
-        return updatedEvents;
-      }
+  const groupOptions = useMemo(() =>
+    groups?.map(group => ({
+      label: group.name,
+      value: group._id
+    })) || [],
+    [groups]
+  );
 
-      const updatedEvents = [...prevEvents, newEvent];
-      updatedEvents.sort((a, b) => {
-        if (a.month !== b.month) return a.month - b.month;
-        return a.date - b.date;
+  // Event handlers
+  const handleAddAssignment = useCallback(() => {
+    if (assignments.length >= 10) {
+      Toast.show({
+        title: 'Limit Reached',
+        description: 'Maximum 10 assignments allowed per event',
+        variant: 'warning',
       });
+      return;
+    }
+    setAssignments(prev => [...prev, { ...INITIAL_ASSIGNMENT }]);
+  }, [assignments.length]);
 
-      return updatedEvents;
-    });
+  const handleRemoveAssignment = useCallback((index: number) => {
+    if (assignments.length <= 1) {
+      Toast.show({
+        title: 'Assignment is required',
+        description: 'At least one assignment is required',
+        variant: 'error',
+      });
+      return;
+    }
+    setAssignments(prev => prev.filter((_, i) => i !== index));
+  }, [assignments.length]);
 
+  const handleAssignmentChange = useCallback((index: number, field: keyof Assignment, value: string) => {
+    setAssignments(prev =>
+      prev.map((assignment, i) =>
+        i === index ? { ...assignment, [field]: value } : assignment
+      )
+    );
+  }, []);
+
+  const resetForm = useCallback(() => {
+    setEventName("");
+    setEventDescription("");
+    setEventLocation("");
+    setEventSwitchValue(false);
+    setSelectedParty("");
+    setDate("");
+    setSelectedStartTime(null);
+    setAssignments([{ ...INITIAL_ASSIGNMENT }]);
+    setValidationErrors({});
     setCreateEventData({
       month: 0,
       date: 0,
@@ -155,22 +303,219 @@ const Calendar = () => {
         priority: 2,
         year: null,
       },
-    })
-    setEventName("")
-    setEventDescription("")
-    setEventLocation("")
-    setEventSwitchValue(false)
+    });
+  }, []);
 
-    createEventModalRef.current?.close();
-  };
+  // Update createEventData when dependencies change
+  useEffect(() => {
+    setCreateEventData(prevData => ({
+      ...prevData,
+      month: selectedMonthIndex,
+      date: selectedDay,
+    }));
+  }, [selectedDay, selectedMonthIndex]);
 
-  const renderDays = () => {
+  const getEventsForDate = useCallback((monthIndex: number, day: number): miqaatProps[] => {
+    return islamicEvents.find(event => event.month === monthIndex && event.date === day)?.miqaats || [];
+  }, [islamicEvents]);
+
+  const changeIslamicMonth = useCallback((offset: number) => {
+    setCurrentIslamicMonthIndex(prev => {
+      const newIndex = prev + offset;
+      if (newIndex < 0) {
+        setCurrentIslamicYear(prevYear => prevYear - 1);
+        return 11;
+      } else if (newIndex > 11) {
+        setCurrentIslamicYear(prevYear => prevYear + 1);
+        return 0;
+      }
+      return newIndex;
+    });
+  }, []);
+
+  const goToToday = useCallback(() => {
+    const todayIslamic = getIslamicDate(new Date())!;
+    setCurrentIslamicYear(todayIslamic.year);
+    setCurrentIslamicMonthIndex(todayIslamic.monthIndex);
+  }, []);
+
+  const createEvent = useCallback(async () => {
+    const errors = validateEventForm();
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      const firstError = Object.values(errors)[0];
+
+      Toast.show({
+        title: 'Validation Error',
+        description: firstError,
+        variant: 'error',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const newEvent: eventProps = {
+        month: createEventData.month,
+        date: createEventData.date,
+        miqaats: [
+          {
+            title: eventName.trim(),
+            description: eventDescription.trim(),
+            location: eventLocation.trim(),
+            priority: 2,
+            phase: eventSwitchValue ? "day" : "night",
+            year: null,
+          },
+        ],
+      };
+
+      setIslamicEvents(prevEvents => {
+        const existingIndex = prevEvents.findIndex(
+          event => event.month === newEvent.month && event.date === newEvent.date
+        );
+
+        let updatedEvents: eventProps[];
+
+        if (existingIndex !== -1) {
+          updatedEvents = [...prevEvents];
+          updatedEvents[existingIndex].miqaats.push(newEvent.miqaats[0]);
+        } else {
+          updatedEvents = [...prevEvents, newEvent];
+        }
+
+        return updatedEvents.sort((a, b) => {
+          if (a.month !== b.month) return a.month - b.month;
+          return a.date - b.date;
+        });
+      });
+
+      resetForm();
+      createEventModalRef.current?.close();
+      Toast.show({
+        title: 'Event Created',
+        description: 'Event created successfully!',
+        variant: 'success',
+      });
+    } catch (error) {
+      Toast.show({
+        title: 'Try Again Later',
+        description: 'Failed to create event. Please try again.',
+        variant: 'error',
+      });
+      console.error("Event creation error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [validateEventForm, createEventData, eventName, eventDescription, eventLocation, eventSwitchValue, resetForm]);
+
+  const handleSubmit = useCallback(async () => {
+    const errors = validateAssignPartyForm();
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      const firstError = Object.values(errors)[0];
+      Toast.show({
+        title: 'Validation Error',
+        description: firstError,
+        variant: 'error',
+      });
+      return;
+    }
+
+    if (!me?._id) {
+      Toast.show({
+        title: 'Authorization',
+        description: 'User not authenticated',
+        variant: 'error',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const dataModel = {
+        location: eventLocation.trim(),
+        name: (eventName || selectedEvents[0]?.title || "").trim(),
+        start_at: date,
+        time: selectedStartTime,
+        created_by: me._id,
+        events: assignments.map(assignment => renameKey(assignment, "name", "type"))
+      };
+
+      console.log('Submitting data:', dataModel);
+
+      await create(dataModel);
+      
+      if (isSuccess) {
+        Toast.show({
+          title: 'Assigned',
+          description: 'Party assigned successfully!',
+          variant: 'success',
+        });
+        resetForm();
+        AssignPartyRef.current?.close();
+      } else {
+        throw new Error("Failed to assign party");
+      }
+      resetForm();
+      AssignPartyRef.current?.close();
+
+    } catch (error) {
+      Toast.show({
+        title: 'Error',
+        description: 'Failed to assign party. Please try again.',
+        variant: 'error',
+      });
+      console.error("Party assignment error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [validateAssignPartyForm, eventLocation, eventName, selectedEvents, date, selectedStartTime, me, assignments, create, resetForm]);
+
+  const handleDateConfirm = useCallback((selectedDate: Date) => {
+    setShowDatePicker(false);
+    const formatted = format(selectedDate, 'MMM dd, yyyy');
+    setDate(formatted);
+  }, []);
+
+  const handleDateCancel = useCallback(() => {
+    setShowDatePicker(false);
+  }, []);
+
+  const handleStartTimeChange = useCallback((_: any, time?: Date) => {
+    setShowStartPicker(false);
+    if (time) {
+      setSelectedStartTime(time);
+    }
+  }, []);
+
+  const handleDayPress = useCallback((dateString: string, islamicDay: number) => {
+    const events = getEventsForDate(currentIslamicMonthIndex, islamicDay);
+    setSelectedDateString(dateString);
+    setSelectedEvents(events);
+    setSelectedDay(islamicDay);
+
+    if (events.length === 0) {
+      createEventModalRef.current?.open();
+    } else {
+      modalRef.current?.open();
+    }
+  }, [getEventsForDate, currentIslamicMonthIndex]);
+
+  // Memoized day rendering for better performance
+  const renderDays = useMemo(() => {
     const days: JSX.Element[] = [];
 
+    // Add blank cells for days before the start of the month
     for (let i = 0; i < startDay; i++) {
       days.push(<View key={`blank-${i}`} style={styles.dayCell} />);
     }
 
+    // Add actual days
     for (let i = 0; i < totalDays; i++) {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + i);
@@ -179,28 +524,19 @@ const Calendar = () => {
       const isToday = dateString === today.toDateString();
       const isSelected = dateString === selectedDateString;
       const events = getEventsForDate(currentIslamicMonthIndex, islamicDate!.day);
-      const highestPriority = Math.min(...events.map(event => event.priority), 4);
+      const highestPriority = events.length > 0 ? Math.min(...events.map(event => event.priority), 4) : 4;
+
       days.push(
         <TouchableOpacity
-          key={i}
+          key={`day-${i}`}
           style={[
             styles.dayCell,
             isToday && styles.today,
             isSelected && styles.selected
           ]}
-          onPress={() => {
-            const events = getEventsForDate(currentIslamicMonthIndex, islamicDate!.day);
-            setSelectedDateString(dateString);
-            setSelectedEvents(events);
-            setSelectedDay(islamicDate!.day)
-
-            if (events.length === 0) {
-              createEventModalRef.current?.open();
-            } else {
-              modalRef.current?.open();
-            }
-          }}
-
+          onPress={() => handleDayPress(dateString, islamicDate!.day)}
+          accessibilityLabel={`${islamicDate!.day} ${islamicMonths[currentIslamicMonthIndex]} ${currentIslamicYear}, ${date.getDate()} ${months[date.getMonth()]}`}
+          accessibilityHint={events.length > 0 ? `${events.length} events` : "No events, tap to create"}
         >
           <Typography
             variant="b2"
@@ -217,237 +553,388 @@ const Calendar = () => {
           >
             {toArabicNumerals(islamicDate!.day)}
           </Typography>
-
-          <Typography variant="b5" style={{ color: getColor("dark", 700) }}>{date.getDate()} {months[date.getMonth()].slice(0, 3)}</Typography>
+          <Typography variant="b5" style={{ color: getColor("dark", 700) }}>
+            {date.getDate()} {months[date.getMonth()].slice(0, 3)}
+          </Typography>
         </TouchableOpacity>
       );
     }
 
     return days;
-  };
+  }, [startDay, totalDays, startDate, today, selectedDateString, getEventsForDate, currentIslamicMonthIndex, handleDayPress, currentIslamicYear]);
 
-  const handleStartTimeChange = (_: any, time?: Date) => {
-    setShowStartPicker(false);
-    if (time) {
-      setSelectedStartTime(time);
-    }
-  };
-  const handleEndTimeChange = (_: any, time?: Date) => {
-    setShowEndPicker(false);
-    if (time) {
-      setSelectedEndTime(time);
-    }
-  };
+  // Loading state
+  if (isLoading) {
+    return (
+      <View style={[styles.pageContainer, styles.centered]}>
+        <ActivityIndicator size="large" color={getColor("blue", 400)} />
+        <Typography variant="h6" style={{ marginTop: 16 }}>Loading Calendar...</Typography>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.pageContainer}>
+      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.headerItem} onPress={() => setCurrentIslamicYear((y) => y - 1)}><Typography variant="b4" color={getColor("dark", 300)}>« Year</Typography></TouchableOpacity>
+        {/* <TouchableOpacity 
+          style={styles.headerItem} 
+          onPress={() => setCurrentIslamicYear(y => y - 1)}
+          accessibilityLabel="Previous year"
+        >
+          <Typography variant="b4" color={getColor("dark", 300)}>« Year</Typography>
+        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.headerItem} onPress={() => setCurrentIslamicYear((y) => y + 1)}><Typography variant="b4" color={getColor("dark", 300)}>» Year</Typography></TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.headerItem} 
+          onPress={() => setCurrentIslamicYear(y => y + 1)}
+          accessibilityLabel="Next year"
+        >
+          <Typography variant="b4" color={getColor("dark", 300)}>» Year</Typography>
+        </TouchableOpacity> */}
 
-        <TouchableOpacity style={styles.headerItem2} onPress={() => setShowDatePicker(true)}><Typography variant="b4" color={getColor("dark", 300)}>Go to Date</Typography></TouchableOpacity>
+        <TouchableOpacity
+          style={styles.headerItem2}
+          onPress={() => setShowDatePicker(true)}
+          accessibilityLabel="Go to specific date"
+        >
+          <Typography variant="b4" color={getColor("dark", 700)}>Go to Date</Typography>
+        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.headerItem2} onPress={goToToday}><Typography variant="b4" color={getColor("dark", 300)}>Today</Typography></TouchableOpacity>
+        <TouchableOpacity
+          style={styles.headerItem2}
+          onPress={goToToday}
+          accessibilityLabel="Go to today"
+        >
+          <Typography variant="b4" color={getColor("dark", 700)}>Today</Typography>
+        </TouchableOpacity>
       </View>
+
+      {/* Islamic Month Navigation */}
       <View style={styles.islamicMonthName}>
-        <Pressable onPress={() => changeIslamicMonth(-1)}>
+        <Pressable
+          onPress={() => changeIslamicMonth(-1)}
+          accessibilityLabel="Previous month"
+        >
           <BackIcon size={16} color={getColor("dark", 700)} />
         </Pressable>
-        <Typography variant="h5" style={styles.textAlignCenter}>{islamicMonths[currentIslamicMonthIndex]} {currentIslamicYear}</Typography>
-        <Pressable onPress={() => changeIslamicMonth(1)} style={{ transform: [{ rotate: "180deg" }] }}>
+        <Typography variant="h5" style={styles.textAlignCenter}>
+          {islamicMonths[currentIslamicMonthIndex]} {currentIslamicYear}
+        </Typography>
+        <Pressable
+          onPress={() => changeIslamicMonth(1)}
+          style={{ transform: [{ rotate: "180deg" }] }}
+          accessibilityLabel="Next month"
+        >
           <BackIcon size={16} color={getColor("dark", 700)} />
         </Pressable>
-
       </View>
 
+      {/* Days of Week */}
       <View style={styles.daysOfWeek}>
-        {daysOfWeek.map((d, idx) => (
-          <Typography variant="b4" key={idx} color={getColor("dark", 700)} style={styles.dayLabel}>{d}</Typography>
+        {daysOfWeek.map((day, idx) => (
+          <Typography
+            variant="b4"
+            key={idx}
+            color={getColor("dark", 700)}
+            style={styles.dayLabel}
+          >
+            {day}
+          </Typography>
         ))}
       </View>
 
-      <View style={styles.grid}>{renderDays()}</View>
+      {/* Calendar Grid */}
+      <View style={styles.grid}>{renderDays}</View>
 
-      <BottomSheetModal title={`Events for ${selectedDateString}`} ref={modalRef} onPress={() => AssignPartyRef.current?.open()} footer="Assign Party">
+      {/* Event Details Modal */}
+      <BottomSheetModal
+        title={`Events for ${selectedDateString}`}
+        ref={modalRef}
+        onPress={() => createEventModalRef.current?.open()}
+        footer="Assign Party"
+      >
         {selectedEvents.map((event, index) => (
-          <View key={index} style={styles.eventCard}>
+          <View key={`event-${index}`} style={styles.eventCard}>
             <CircleIcon />
-            <View key={index} style={[styles.VStack, { flex: 1, minWidth: 0 }]}>
-              <Typography variant="b4" style={{
-                color: getColor('dark', 700),
-              }}>
+            <View style={[styles.VStack, { flex: 1, minWidth: 0 }]}>
+              <Typography variant="b4" style={{ color: getColor('dark', 700) }}>
                 {event.title} - {event.description || 'No description'}
               </Typography>
-              <Typography variant="b5" style={{ fontSize: 12, fontWeight: "400", lineHeight: 14 }} color={getColor('dark', 300)}>@Burhanpur</Typography>
             </View>
           </View>
         ))}
       </BottomSheetModal>
 
-      <BottomSheetModal title={`Events for ${selectedDateString}`} ref={createEventModalRef} footer="Create Event" onPress={createEvent} disabled={
-        eventName === "" || 
-        eventDescription === "" || 
-        eventLocation === "" || 
-        selectedParty === ""
-}>
-  <ScrollView>
-  <View style={{ gap: 16 }}>
-        <Input
-          placeholder='Event Name'
-          value={eventName}
-          onChangeText={setEventName}>
-            Event Name</Input>
+      {/* Create Event Modal */}
+      <BottomSheetModal
+        title={`Create Event for ${selectedDateString}`}
+        ref={createEventModalRef}
+        footer={isSubmitting ? "Creating..." : "Create Event"}
+        onPress={handleSubmit}
+        disabled={isSubmitting}
+      >
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={{ gap: 16 }}>
+            <Input
+              placeholder='Event Name'
+              value={eventName}
+              onChangeText={setEventName}
+              error={validationErrors.eventName}
+            >
+              Event Name *
+            </Input>
 
-        <Select
-          options={[
-            { label: "Hakimi - Jafarussadiq", value: "hakimi" },
-            { label: "Husaini - Hussain", value: "husaini" },
-            { label: "Taheri - Mohammed", value: "taheri" },
-          ]}
-          value={selectedParty}
-          onSelect={(party) => setSelectedParty(party)}
-          placeholder="Assign Party"
-        />
+            <Input
+              placeholder='Event Description'
+              value={eventDescription}
+              onChangeText={setEventDescription}
+              multiline
+              error={validationErrors.eventDescription}
+            >
+              Event Description *
+            </Input>
 
-        <Input
-          placeholder='Event Description'
-          value={eventDescription}
-          onChangeText={setEventDescription}>
-            Event Description</Input>
-      <View style={styles.HStack}>
-        <Input
-          placeholder='Event start'
-          mask="time"
-          value={selectedStartTime ? dayjs(selectedStartTime).format("hh:mm A") : ""}
-          onFocus={() => setShowStartPicker(true)}
-          onPress={() => setShowStartPicker(true)}
-          showSoftInputOnFocus={false}
-          />
-          
-        <Input
-          placeholder='Event End'
-          mask="time"
-          value={selectedEndTime ? dayjs(selectedEndTime).format("hh:mm A") : ""}
-          onFocus={() => setShowEndPicker(true)}
-          onPress={() => setShowEndPicker(true)}
-          showSoftInputOnFocus={false}
-          />
+            <View style={[styles.HStack, { justifyContent: "space-between" }]}>
+              <Typography variant="h5">Assign Kalams *</Typography>
+              <Button
+                variant="outline"
+                size="sm"
+                onPress={handleAddAssignment}
+                disabled={assignments.length >= 10}
+              >
+                Add
+              </Button>
+            </View>
+
+            {validationErrors.assignments && (
+              <Typography variant="b5" color={getColor("red", 400)}>
+                {validationErrors.assignments}
+              </Typography>
+            )}
+
+            {assignments.map((item, index) => (
+              <View key={`assignment-${index}`} style={styles.HStack}>
+                <Select
+                  options={KALAM_OPTIONS}
+                  style={{ flex: 0.8 }}
+                  value={item.name}
+                  onSelect={(val) => handleAssignmentChange(index, "name", val)}
+                  placeholder="Select"
+                />
+                <Select
+                  style={{ flex: 1 }}
+                  options={groupOptions}
+                  value={item.party}
+                  onSelect={(val) => handleAssignmentChange(index, "party", val)}
+                  placeholder="Assign Party"
+                />
+                {assignments.length > 1 && (
+                  <TouchableOpacity onPress={() => handleRemoveAssignment(index)}>
+                    <CrossIcon />
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
+
+            <Input
+              placeholder='Event start time'
+              mask="time"
+              value={selectedStartTime ? dayjs(selectedStartTime).format("hh:mm A") : ""}
+              onFocus={() => setShowStartPicker(true)}
+              onPress={() => setShowStartPicker(true)}
+              showSoftInputOnFocus={false}
+              error={validationErrors.selectedStartTime}
+            >
+              Event Start Time *
+            </Input>
+
+            <Input
+              placeholder='Event Date'
+              mask="date"
+              value={date}
+              onFocus={() => setShowDatePicker(true)}
+              onPress={() => setShowDatePicker(true)}
+              showSoftInputOnFocus={false}
+              error={validationErrors.date}
+            >
+              Event Date *
+            </Input>
+
+            <Input
+              placeholder='Event Location'
+              value={eventLocation}
+              onChangeText={setEventLocation}
+              error={validationErrors.eventLocation}
+            >
+              Event Location *
+            </Input>
           </View>
-        <Input
-          placeholder='Event Location'
-          value={eventLocation}
-          onChangeText={setEventLocation}>
-            Event Location</Input>
-
-        <Switch
-          text={"day"}
-          value={eventSwitchValue}
-          onValueChange={setEventSwitchValue}
-        />
-        </View>
         </ScrollView>
       </BottomSheetModal>
 
-      <BottomSheetModal title={`Assign Party for ${selectedDateString}`} ref={AssignPartyRef} footer="Assign" disabled={selectedParty === ''}>
-      <Select
-          options={[
-            { label: "Hakimi - Jafarussadiq", value: "hakimi" },
-            { label: "Husaini - Hussain", value: "husaini" },
-            { label: "Taheri - Mohammed", value: "taheri" },
-          ]}
-          value={selectedParty}
-          onSelect={(party) => setSelectedParty(party)}
-          placeholder="Assign Party"
-        />
-      </BottomSheetModal>
+      {/* Overlay */}
       <Overlay />
+
+      {/* Time Picker */}
       {showStartPicker && (
-       <TimePicker selectedTime={selectedStartTime} handleTimeChange={handleStartTimeChange} />
+        <TimePicker
+          selectedTime={selectedStartTime}
+          handleTimeChange={handleStartTimeChange}
+        />
       )}
-      {showEndPicker && (
-       <TimePicker selectedTime={selectedEndTime} handleTimeChange={handleEndTimeChange} />
+
+      {/* Date Picker */}
+      {showDatePicker && (
+        <DateTimePickerModal
+          isVisible={showDatePicker}
+          mode="date"
+          date={new Date()}
+          onConfirm={handleDateConfirm}
+          onCancel={handleDateCancel}
+          minimumDate={new Date()}
+          maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() + 2))}
+        />
       )}
     </ScrollView>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   pageContainer: {
-    backgroundColor: getColor('light', 200),
-    flex: 1,
+    flexGrow: 1,
     padding: 16,
-    gap: 16,
+    backgroundColor: getColor("light", 50),
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  headerItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: getColor("light", 100),
+    borderRadius: 8,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  headerItem2: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: getColor("green"),
+    borderRadius: 8,
+    minWidth: 90,
+    alignItems: 'center',
+  },
+  islamicMonthName: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
   },
   textAlignCenter: {
     textAlign: 'center',
-  },
-  islamicMonthName: {
-    backgroundColor: getColor("green", 100),
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    flex: 1,
+    marginHorizontal: 16,
   },
   daysOfWeek: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    marginBottom: 10,
+    paddingHorizontal: 4,
   },
   dayLabel: {
-    width: '14.28%',
+    flex: 1,
     textAlign: 'center',
+    fontWeight: '600',
+    paddingVertical: 8,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginBottom: 20,
   },
   dayCell: {
-    width: '14.28%',
-    height: 60,
+    width: '14.285%', // 100/7
+    aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderColor: getColor("dark", 300),
     borderWidth: 0.5,
+    borderColor: getColor("light", 200),
+    backgroundColor: getColor("light", 100),
+    padding: 4,
   },
   today: {
     backgroundColor: getColor("blue", 100),
+    borderColor: getColor("blue", 300),
+    borderWidth: 2,
   },
   selected: {
-    backgroundColor: getColor("green", 100),
+    backgroundColor: getColor("blue", 200),
+    borderColor: getColor("blue", 400),
+    borderWidth: 2,
   },
-
   eventCard: {
-    borderWidth: 0.5,
-    borderColor: getColor("dark", 300),
-    padding: 8,
-    borderRadius: 4,
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    shadowColor: getColor("dark", 400), 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84, 
+    elevation: 5, 
+    padding: 12,
+    marginVertical: 4,
+    backgroundColor: getColor("light", 100),
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: getColor("blue", 400),
+    gap: 12,
   },
   VStack: {
-    flexDirection: "column",
+    flexDirection: 'column',
     gap: 4,
   },
   HStack: {
-    flexDirection: "row",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
   },
-  headerItem: {
-    backgroundColor: getColor("yellow", 100),
-    padding: 6,
-    borderRadius: 8
+  errorText: {
+    color: getColor("red", 400),
+    fontSize: 12,
+    marginTop: 4,
   },
-  headerItem2: {
-    backgroundColor: getColor("blue", 100),
-    padding: 6,
-    borderRadius: 8
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    maxHeight: '80%',
+  },
+  formSection: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    marginBottom: 12,
+    fontWeight: '600',
+  },
+  assignmentRow: {
+    marginBottom: 12,
+  },
+  requiredField: {
+    color: getColor("red", 400),
   },
 });
 

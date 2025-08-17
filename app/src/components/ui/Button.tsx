@@ -32,7 +32,8 @@ const Button = ({
   size = "lg",
   full,
   disabled,
-  color = "green", // ✅ default color
+  style,
+  color = "green", 
 }: ButtonProps) => {
   const scale = new Animated.Value(1);
   const opacity = new Animated.Value(1); 
@@ -99,7 +100,7 @@ const Button = ({
       onPress={(event) => !disabled && onPress?.(event)}
       onPressIn={() => !disabled && handlePressIn()}
       onPressOut={() => !disabled && handlePressOut()}
-      style={[containerStyle, getButtonStyle(size)]}
+      style={[containerStyle, getButtonStyle(size), style]}
     >
       <Animated.View style={animatedStyle}>
         <Typography variant={getButtonFont(size)} color={textColor}>

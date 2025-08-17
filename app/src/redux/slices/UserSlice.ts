@@ -13,7 +13,7 @@ export type User = {
     grade: string;
     address: string;
     belongsto: string;
-    role: 'member' | 'groupAdmin' | 'superadmin';
+    role: 'member' | 'groupadmin' | 'superadmin';
     attendence: any[];
     createdat: string;
     updatedat: string;
@@ -54,6 +54,30 @@ export type User = {
       handleRemoveUser: (state, action: PayloadAction<string>) => {
         state.users = state.users.filter(user => user.userid !== action.payload);
       },
+      handleUpdateUserRole: (state, action: PayloadAction<{ transferAdminId: string; admin: string }>) => {
+        const { transferAdminId, admin } = action.payload;
+        state.users = state.users?.map(user => {
+          if (user._id === transferAdminId) {
+            return { ...user, role: 'groupadmin' };
+          }
+          if (user._id === admin) {
+            return { ...user, role: 'member' };
+          }
+          return user;
+        });
+      },
+      handleAddUserInParty: (state, action: PayloadAction<{ user: string, name: string }>) => {
+        const { user, name } = action.payload;
+        state.users = state.users.map(value =>
+          value._id === user ? { ...value, belongsto: name } : value
+        );
+      },
+      handleRemoveUserFromParty: (state, action: PayloadAction<{ user: string }>) => {
+        const { user } = action.payload;
+        state.users = state.users.map(value =>
+          value._id === user ? { ...value, belongsto: '' } : value
+        );
+      } 
     },
   });
   
@@ -61,6 +85,9 @@ export type User = {
     handleAddUser,
     handleFetchUser,
     handleFetchMe,
+    handleAddUserInParty,
+    handleUpdateUserRole,
+    handleRemoveUserFromParty,
     handleRemoveUser,
   } = UserSlice.actions;
   

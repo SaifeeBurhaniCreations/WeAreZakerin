@@ -14,7 +14,7 @@ import useAppNavigation from '../hooks/useAppNavigation'
 
 const HomeScreen = () => {
 
-  const { groups } = useSelector((state: RootState) => state.modal);
+  const { groups } = useSelector((state: RootState) => state.party);
 
   const { goTo } = useAppNavigation()
   

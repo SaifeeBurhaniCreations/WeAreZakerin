@@ -53,20 +53,30 @@ const AddPartySlice = createSlice({
       state.groups = state.groups.filter((group) => group.id !== action.payload);
     },
     handleAddMemberInGroup: (state, action) => {
-      const { name, id } = action.payload; // `id` here is likely the user object with an `_id` property
+      const { name, user } = action.payload;
+      const { _id, role } = user;
 
       const groupToUpdate = state.groups.find((group) => group.name === name);
 
+
       if (groupToUpdate) {
-        // Ensure 'members' is an array. If it's not an array, reinitialize it.
+        // Ensure 'members' is an array
         if (!Array.isArray(groupToUpdate.members)) {
           groupToUpdate.members = [];
         }
 
-        // Push the user's ID. Assuming 'id' in action.payload is the user object.
-        groupToUpdate.members.push(id?._id);
+        // Add user._id to members if not already included
+        const alreadyMember = groupToUpdate.members.includes(_id);
+        if (!alreadyMember) {
+          groupToUpdate.members.push(_id);
+        }
+
+        // If user is not just a regular member, update admin
+        if (role !== 'member') {
+          groupToUpdate.admin = _id;
+        }
       }
-    },
+    },    
     handleRemoveMemberFromGroup: (state, action) => {
       const { name, id } = action.payload; // 'id' can be a string (user id) or an object with _id
     
@@ -74,9 +84,6 @@ const AddPartySlice = createSlice({
     
     if (groupToUpdate) {
       const memberId = id;
-      console.log(groupToUpdate.members.filter(
-        (memberIdInGroup) => memberIdInGroup !== memberId
-      ));
     
         // Filter out the member with the matching ID
         groupToUpdate.members = groupToUpdate.members.filter(
@@ -84,7 +91,7 @@ const AddPartySlice = createSlice({
         );
       }
     }
-    
+
   },
 });
 

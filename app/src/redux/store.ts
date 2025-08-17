@@ -3,13 +3,15 @@ import fabReducer from "./slices/FabSlice";
 import modalReducer from "./slices/AddPartySlice";
 import adminModalReducer from "./slices/AddAdminSlice";
 import UserReducer from "./slices/UserSlice";
+import OccassionReducer from "./slices/OccassionSlice";
 
 export const store = configureStore({
   reducer: {
     fab: fabReducer,
-    modal: modalReducer,
+    party: modalReducer,
     adminModal: adminModalReducer,
-    users: UserReducer
+    users: UserReducer,
+    occassions: OccassionReducer,
   },
 });
 
