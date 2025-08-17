@@ -30,13 +30,14 @@
       [
         "expo-splash-screen",
         {
-          "image": "./src/assets/images/logo-main.jpg",     
-          "imageWidth": 200,                                 
-          "resizeMode": "contain",                           
-          "backgroundColor": "#A7C6A9"                      
+          "image": "./src/assets/images/logo-main.jpg",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#A7C6A9"
         }
       ],
-      "expo-dev-client"
+      "expo-dev-client",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
