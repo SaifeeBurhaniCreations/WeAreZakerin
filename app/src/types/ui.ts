@@ -82,6 +82,25 @@ export interface CreateEventData {
     miqaat: miqaatProps;
 }
 
+export interface CalendarState {
+    currentIslamicYear: number;
+    currentIslamicMonthIndex: number;
+    selectedDay: number;
+    selectedDateString: string;
+    hasError: boolean;
+    errorMessage: string;
+}
+
+export interface CalendarDay {
+    date: Date;
+    islamicDate: { year: number; monthIndex: number; day: number };
+    dateString: string;
+    isToday: boolean;
+    isSelected: boolean;
+    events: miqaatProps[];
+    highestPriority: number;
+}
+
 export interface ValidationErrors {
     eventName?: string;
     eventDescription?: string;
@@ -224,4 +243,39 @@ export interface EventData {
     name: string;
     party: string;
     rating: Rating[];
+}
+
+export interface EventFormType {
+    // State
+    eventName: string;
+    eventDescription: string;
+    eventLocation: string;
+    eventSwitchValue: boolean;
+    date: string;
+    selectedStartTime: Date | null;
+    assignments: Assignment[];
+    validationErrors: ValidationErrors;
+    isSubmitting: boolean;
+    isInstant: boolean;
+
+    // Actions
+    setEventName: (name: string) => void;
+    setEventDescription: (description: string) => void;
+    setEventLocation: (location: string) => void;
+    setEventSwitchValue: (value: boolean) => void;
+    setDate: (date: string) => void;
+    setSelectedStartTime: (time: Date | null) => void;
+    setAssignments: React.Dispatch<React.SetStateAction<Assignment[]>>;
+    setValidationErrors: React.Dispatch<React.SetStateAction<ValidationErrors>>;
+    setIsSubmitting: (submitting: boolean) => void;
+    setIsInstant: (instant: boolean) => void;
+
+    // Methods
+    resetForm: () => void;
+    validateEventForm: () => ValidationErrors;
+
+    // Assignment management (optional)
+    addAssignment?: () => void;
+    removeAssignment?: (index: number) => void;
+    updateAssignment?: (index: number, field: keyof Assignment, value: string) => void;
 }

@@ -5,9 +5,19 @@ import BackIcon from '../icons/BackIcon'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '@/src/types/navigation'
 import { PageHeaderProps } from '@/src/types'
+import { useSecureStorageState } from '@/src/hooks/useSecureStorageState'
+import useAppNavigation from '@/src/hooks/useAppNavigation'
 
 const PageHeader = ({ title, goBack, canGoBack }: PageHeaderProps) => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const [, , removeMetaData] = useSecureStorageState<any>('metadata', null);
+    const { goTo, resetTo } = useAppNavigation()
+
+
+    const handleLogout = async() => {
+        await removeMetaData();
+        resetTo("Landing");
+    }
 
     const handleBackPress = () => {
         if (canGoBack) {

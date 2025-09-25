@@ -14,7 +14,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "versionCode": 1,
@@ -46,7 +46,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "e4e6716b-0563-420b-8723-ffe410d1d7e1"
+        "projectId": "b12af015-d561-4160-a63e-15b6be535274"
       }
     },
     "runtimeVersion": {

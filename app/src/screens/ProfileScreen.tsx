@@ -28,6 +28,7 @@ import { ChooseAdminFormData, chooseAdminSchema } from '../schemas/UserSchema';
 import BottomSheetModal from '../components/ui/modals/BottomSheetModal';
 import AddMemberModal from '../components/ui/AddMemberModal';
 import { clearOccassions } from '../redux/slices/OccassionSlice';
+import { usePendingOccasions } from '../hooks/useOccassion';
 
 
 type ProfileRouteProp = RouteProp<RootStackParamList, 'Profile'>;
@@ -35,6 +36,12 @@ type ProfileRouteProp = RouteProp<RootStackParamList, 'Profile'>;
 const ProfileScreen = () => {
   const route = useRoute<ProfileRouteProp>();
   const id = route?.params?.id;
+  const { 
+    data: Occassions, 
+    isLoading: isLoadingOccassion, 
+    error: occasionError,
+    refetch: refetchOccasions 
+  } = usePendingOccasions('ended');
 
   const addMemberRef = useRef<AddDataModalRef>(null);
   
@@ -71,21 +78,21 @@ const ProfileScreen = () => {
 
   }, [selectedValue])
 
-  // if (!id) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //       <Typography variant="h5" color="red">No user ID provided.</Typography>
-  //     </View>
-  //   );
-  // }
+  if (!id) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Typography variant="h5" color="red">No user ID provided.</Typography>
+      </View>
+    );
+  }
 
-  // if (!selectedUser) {
-  //   return (
-  //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //       <Typography variant="h5" color="red">User not found.</Typography>
-  //     </View>
-  //   );
-  // }
+  if (!selectedUser) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Typography variant="h5" color="red">User not found.</Typography>
+      </View>
+    );
+  }
 
   const isAdminRequired = selectedUser?.role !== 'member';
 
