@@ -8,11 +8,17 @@
       "developmentClient": true,
       "distribution": "internal"
     },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk"         
+      },
+      "env": {
+        "NODE_VERSION": "20.19.4"
+      }
+    },
     "preview": {
       "distribution": "internal"
-    },
-    "production": {
-      "autoIncrement": true
     }
   },
   "submit": {

@@ -3,12 +3,13 @@ import { View, StyleSheet, Dimensions } from "react-native";
 import { NavigationProp, useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import * as SecureStore from "expo-secure-store";
 import PageHeader from "../ui/PageHeader";
+
 import Fab from "../ui/Fab";
 import { RootStackParamList, screenTitleMap } from "@/src/types";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { handleFetchGroup } from "@/src/redux/slices/AddPartySlice";
-import { handleFetchMe, handleFetchUser } from "@/src/redux/slices/UserSlice";
 import { fetchGroup } from "@/src/service/GroupService";
+import { handleFetchMe, handleFetchUser } from "@/src/redux/slices/UserSlice";
 import { fetchMe, fetchUser } from "@/src/service/UserService";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -95,19 +96,28 @@ const restrictFab: RouteNames[] = [
 }
 
 export function AntiAuthGuard({ children }: { children: React.ReactNode }) {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
+
+
   useEffect(() => {
     const checkAuth = async () => {
       const token = await SecureStore.getItemAsync("metadata");
       if (token) {
-        navigation.reset({ index: 0, routes: [{ name: "Home" }] });
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Home" }],
+        });
       }
     };
     checkAuth();
   }, []);
-  return <View style={{ flex: 1 }}>{children}</View>;
-}
 
+  return (
+    <View style={{ flex: 1 }}>
+      {children}
+    </View>
+  );
+}
 
 
 const styles = StyleSheet.create({

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { socket } from "../lib/socket";
-import { QUERY_KEYS } from "./useOccassion";
+import { QUERY_KEYS } from "../constants/queryKeys";
 import { Occassion } from "../redux/slices/OccassionSlice";
 
 // Socket event types

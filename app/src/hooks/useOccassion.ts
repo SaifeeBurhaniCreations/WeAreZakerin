@@ -15,17 +15,7 @@ import {
 import { Occassion } from "../redux/slices/OccassionSlice";
 import { socket } from "../lib/socket";
 import { useSocketListeners } from "./useSocketListener";
-
-// Query Keys
-export const QUERY_KEYS = {
-    occasions: ['occasions'],
-    occasion: (id: string) => ['occasions', id],
-    occasionsByDate: (date: string) => ['occasions', 'date', date],
-    occasionsByMonth: (month: string) => ['occasions', 'month', month],
-    occasionsByYear: (year: string) => ['occasions', 'year', year],
-    occasionGroups: ['occasions', 'groups'],
-    pendingOccasions: (statuses: string[]) => ['occasions', ...statuses],
-};
+import { QUERY_KEYS } from "../constants/queryKeys";
 
 // 1️⃣ Fetch ALL occasions with socket integration
 export const useOccasions = () => {
